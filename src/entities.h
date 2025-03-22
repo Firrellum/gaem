@@ -42,6 +42,7 @@ typedef struct GameState {
     bool game_over;
     Player player;
     ParticleSystem particles;
+    Color border_color;
 } GameState;
 
 

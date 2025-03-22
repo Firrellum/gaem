@@ -16,6 +16,7 @@ void write_to_file(const char *text);
 void setup(GameState* game);
 void calculate_delta_time(GameState* game);
 void render_game(GameState* game);
+void render_border(GameState* game);
 void update_game(GameState* game);
 void handle_inputs(GameState* game, Player* player);
 void cleanup_and_quit(GameState* game);
@@ -90,9 +91,24 @@ void update_game(GameState* game){
     update_particles(&game->particles, game->delta_time);
 }
 
+void render_border(GameState* game){
+    SDL_SetRenderDrawColor(game->renderer, 0, 255, 255, 75); // color border
+
+    // border || SDL defaults to one pixel wide | for loop
+    for (int i = 0; i < BORDER_SIZE; i++){
+        SDL_Rect border_rect = {i, i, WINDOW_WIDTH - (2 * i), WINDOW_HEIGHT - (2 * i)};
+        SDL_RenderDrawRect(game->renderer, &border_rect);
+    }
+    // SDL_Rect border_rect = {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
+
+    // NEED TO SUPTRACT BORDER FROM PLAYER BOUNDS
+    
+}
+
 void render_game(GameState* game){
     SDL_SetRenderDrawColor(game->renderer, 0, 0, 0, 255); // Set colot
     SDL_RenderClear(game->renderer); // clear Screen
+    render_border(game); // render border
     render_particles(&game->particles, game->renderer); // pender particles
     render_player_cube(&game->player, game->renderer); // render player
     SDL_RenderPresent(game->renderer); // present render
