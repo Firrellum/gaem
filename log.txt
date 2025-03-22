@@ -2,6 +2,7 @@ Hello Game!
 Initialized SDL | VIDEO
 Created window.
 Created renderer.
+Spawn cube.
 Destroying renderer.
 Destroying widow.
 Exiting..0/

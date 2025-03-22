@@ -10,6 +10,21 @@ This is a simple game side project built using SDL2. Currently the game initiali
 - A compiler that supports C (GCC recommended)
 - Make (for using the provided Makefile)
 
+## Config
+
+Game runs at 120 FPS
+
+## Controls
+
+- `ESC`: Close the window
+- `WSAD || ARROWS` : Move cube 
+
+## Future Improvements
+
+- Add enemy AI
+
+---
+
 ## Building the Game
 
 To build the game, use:
@@ -33,16 +48,3 @@ To remove the built game binary:
 ```sh
 make clean
 ```
-
-## Exit
-
-- `ESC`: Close the window
-
-## Future Improvements
-
-- Create Player Cube
-- Implement player movement
-- Add enemy AI
-
----
-

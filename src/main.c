@@ -1,5 +1,5 @@
-#include <stdio.h>
 #include <SDL2/SDL.h>
+#include <stdio.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <math.h>
@@ -9,14 +9,15 @@
 #include "entities.h"
 #include "player.h"
 
-FILE *file;
-
+FILE *file; // use write_to_file(); to output to the log.txt
+ 
 bool init_game(GameState* game);
 void write_to_file(const char *text);
 void setup(GameState* game);
 void calculate_delta_time(GameState* game);
 void render_game(GameState* game);
-void handle_inputs(GameState* game);
+void update_game(GameState* game);
+void handle_inputs(GameState* game, Player* player);
 void cleanup_and_quit(GameState* game);
 
 void write_to_file(const char* text){
@@ -33,7 +34,7 @@ void cleanup_and_quit(GameState* game){
     SDL_Quit();
 }
 
-void handle_inputs(GameState* game){
+void handle_inputs(GameState* game, Player* player){
     SDL_Event event;
 
     while(SDL_PollEvent(&event)){
@@ -41,6 +42,35 @@ void handle_inputs(GameState* game){
             game->running = false;
         }
     }
+
+    // get keyboard state
+    const Uint8* keyboard_state = SDL_GetKeyboardState(NULL);
+    // scope player
+    Player updated_player = *player;
+    updated_player.dx = 0;
+    updated_player.dy = 0;
+    // update movement
+    if (keyboard_state[SDL_SCANCODE_W] || keyboard_state[SDL_SCANCODE_UP]) updated_player.dy = -1;
+    if (keyboard_state[SDL_SCANCODE_S] || keyboard_state[SDL_SCANCODE_DOWN]) updated_player.dy = 1;
+    if (keyboard_state[SDL_SCANCODE_A] || keyboard_state[SDL_SCANCODE_LEFT]) updated_player.dx = -1;
+    if (keyboard_state[SDL_SCANCODE_D] || keyboard_state[SDL_SCANCODE_RIGHT]) updated_player.dx = 1;
+
+    if (updated_player.dx != 0 && updated_player.dy != 0) {
+        float length = sqrt(updated_player.dx * updated_player.dx + updated_player.dy * updated_player.dy);
+        updated_player.dx /= length;
+        updated_player.dy /= length;
+    }
+
+    *player = updated_player;
+}
+
+void update_game(GameState* game){
+    int frame_time = SDL_GetTicks() - game->last_frame_time;
+        if (frame_time < (FRAME_TARGET_TIME)) {
+            SDL_Delay(FRAME_TARGET_TIME - frame_time);
+        }
+    calculate_delta_time(game);
+    update_player(&game->player, game->delta_time);
 }
 
 void render_game(GameState* game){
@@ -50,9 +80,9 @@ void render_game(GameState* game){
     SDL_RenderPresent(game->renderer); // Present render
 }
 
-void calculate_delta_time(GameState* game){
-    double current_time = SDL_GetTicks() / FRAME_TARGET_TIME;
-    game->delta_time = current_time - game->last_frame_time;
+void calculate_delta_time(GameState* game) {
+    Uint32 current_time = SDL_GetTicks();  
+    game->delta_time = (current_time - game->last_frame_time) / 1000.0f; 
     game->last_frame_time = current_time;
 }
 
@@ -64,6 +94,7 @@ void setup(GameState* game){
     game->player.dx = 0;
     game->player.dy = 0;
     game->player.alive = true;
+    game->player.speed = MOVE_SPEED;
     write_to_file("Spawn cube.");
 
 }
@@ -113,7 +144,7 @@ bool init_game(GameState* game){
 int main(int argc, char *argv[]){
     // srand(time(NULL));
 
-    // create a ew gamestate with no defined parameters
+    // create a new gamestate with no defined parameters
     GameState game = {0};
     game.running = true;
     if(!init_game(&game)){
@@ -124,15 +155,13 @@ int main(int argc, char *argv[]){
 
     // game loop
     while(game.running){
-        // calculate delta time and set frame rate
-        calculate_delta_time(&game);
-        // handle inputs
-        handle_inputs(&game); // Just esc for now
+        handle_inputs(&game, &game.player); // handle inputs
+        update_game(&game); // update game
         render_game(&game); // render game
         
     }
 
     cleanup_and_quit(&game);
-    return 1;
+    return 0;
 }
 
