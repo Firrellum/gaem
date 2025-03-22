@@ -12,7 +12,7 @@ This is a simple game side project built using SDL2. Currently the game initiali
 
 ## Config
 
-Game runs at 120 FPS
+Game aims and caps at 120 FPS
 
 ## Controls
 
@@ -22,6 +22,8 @@ Game runs at 120 FPS
 ## Future Improvements
 
 - Add enemy AI
+- Border
+- UI 
 
 ---
 
