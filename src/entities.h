@@ -4,12 +4,7 @@
 #include <stdbool.h>
 #include <SDL2/SDL.h>
 #include "constants.h"
-
-// enemy movement direction
-typedef enum {
-    HORIZONTAL,
-    VERTICAL
-} Direction;
+#include "utils.h"
 
 // player data
 typedef struct {
@@ -19,6 +14,22 @@ typedef struct {
     float dx, dy;         
     bool alive;           
 } Player;
+
+// particle data
+typedef struct {
+    float x, y;          
+    float dx, dy;         
+    float lifetime;  
+    Color color;     
+    float alpha;          
+} Particle;
+
+// particle system data
+typedef struct {
+    Particle particles[MAX_PARTICLES];  
+    int count;               
+    float spawn_timer;       
+} ParticleSystem;
 
 // game state
 typedef struct GameState {
@@ -30,6 +41,7 @@ typedef struct GameState {
     int score;
     bool game_over;
     Player player;
+    ParticleSystem particles;
 } GameState;
 
 

@@ -2,8 +2,8 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <stdio.h>
-#include <math.h>
 #include <stdlib.h>
+#include <math.h>
 #include <time.h>
 #include "constants.h"
 #include "entities.h"
@@ -37,6 +37,7 @@ void cleanup_and_quit(GameState* game){
 void handle_inputs(GameState* game, Player* player){
     SDL_Event event;
 
+    // exit on escape
     while(SDL_PollEvent(&event)){
         if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_ESCAPE){
             game->running = false;
@@ -55,29 +56,48 @@ void handle_inputs(GameState* game, Player* player){
     if (keyboard_state[SDL_SCANCODE_A] || keyboard_state[SDL_SCANCODE_LEFT]) updated_player.dx = -1;
     if (keyboard_state[SDL_SCANCODE_D] || keyboard_state[SDL_SCANCODE_RIGHT]) updated_player.dx = 1;
 
+    // keep diag movement at the same speed as x and y movement
     if (updated_player.dx != 0 && updated_player.dy != 0) {
         float length = sqrt(updated_player.dx * updated_player.dx + updated_player.dy * updated_player.dy);
         updated_player.dx /= length;
         updated_player.dy /= length;
     }
 
+    // update global player
     *player = updated_player;
 }
 
 void update_game(GameState* game){
+    // get frame time and delay update by it
     int frame_time = SDL_GetTicks() - game->last_frame_time;
         if (frame_time < (FRAME_TARGET_TIME)) {
             SDL_Delay(FRAME_TARGET_TIME - frame_time);
         }
+    // calculate delta time
     calculate_delta_time(game);
+    
+    // update player
     update_player(&game->player, game->delta_time);
+
+    // particles | spawn on move
+    if (game->particles.spawn_timer >= SPAWN_RATE){
+        game->particles.spawn_timer = 0;
+        if((game->player.dx != 0 || game->player.dy != 0)){
+            spawn_particle(&game->particles, &game->player);
+        }
+    }
+    // update spawend particles
+    update_particles(&game->particles, game->delta_time);
 }
 
 void render_game(GameState* game){
     SDL_SetRenderDrawColor(game->renderer, 0, 0, 0, 255); // Set colot
-    SDL_RenderClear(game->renderer); // Clear Screen
-    render_player_cube(&game->player, game->renderer);
-    SDL_RenderPresent(game->renderer); // Present render
+    SDL_RenderClear(game->renderer); // clear Screen
+    render_particles(&game->particles, game->renderer); // pender particles
+    render_player_cube(&game->player, game->renderer); // render player
+    SDL_RenderPresent(game->renderer); // present render
+
+    // order matters here
 }
 
 void calculate_delta_time(GameState* game) {
@@ -95,6 +115,7 @@ void setup(GameState* game){
     game->player.dy = 0;
     game->player.alive = true;
     game->player.speed = MOVE_SPEED;
+
     write_to_file("Spawn cube.");
 
 }
