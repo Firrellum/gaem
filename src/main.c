@@ -16,6 +16,7 @@ void write_to_file(const char *text);
 void setup(GameState* game);
 void calculate_delta_time(GameState* game);
 void render_game(GameState* game);
+void render_start_screen(GameState* game);
 void render_border(GameState* game);
 void update_game(GameState* game);
 void handle_inputs(GameState* game, Player* player);
@@ -43,29 +44,36 @@ void handle_inputs(GameState* game, Player* player){
         if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_ESCAPE){
             game->running = false;
         }
+        if (game->mode == STATE_START_SCREEN && event.key.keysym.sym == SDLK_RETURN) {
+            game->mode = STATE_PLAYING; // Switch to gameplay when Enter is pressed
+        }
     }
 
-    // get keyboard state
-    const Uint8* keyboard_state = SDL_GetKeyboardState(NULL);
-    // scope player
-    Player updated_player = *player;
-    updated_player.dx = 0;
-    updated_player.dy = 0;
-    // update movement
-    if (keyboard_state[SDL_SCANCODE_W] || keyboard_state[SDL_SCANCODE_UP]) updated_player.dy = -1;
-    if (keyboard_state[SDL_SCANCODE_S] || keyboard_state[SDL_SCANCODE_DOWN]) updated_player.dy = 1;
-    if (keyboard_state[SDL_SCANCODE_A] || keyboard_state[SDL_SCANCODE_LEFT]) updated_player.dx = -1;
-    if (keyboard_state[SDL_SCANCODE_D] || keyboard_state[SDL_SCANCODE_RIGHT]) updated_player.dx = 1;
 
-    // keep diag movement at the same speed as x and y movement
-    if (updated_player.dx != 0 && updated_player.dy != 0) {
-        float length = sqrt(updated_player.dx * updated_player.dx + updated_player.dy * updated_player.dy);
-        updated_player.dx /= length;
-        updated_player.dy /= length;
+    if(game->mode == STATE_PLAYING){
+        // get keyboard state
+        const Uint8* keyboard_state = SDL_GetKeyboardState(NULL);
+        // scope player
+        Player updated_player = *player;
+        updated_player.dx = 0;
+        updated_player.dy = 0;
+        // update movement
+        if (keyboard_state[SDL_SCANCODE_W] || keyboard_state[SDL_SCANCODE_UP]) updated_player.dy = -1;
+        if (keyboard_state[SDL_SCANCODE_S] || keyboard_state[SDL_SCANCODE_DOWN]) updated_player.dy = 1;
+        if (keyboard_state[SDL_SCANCODE_A] || keyboard_state[SDL_SCANCODE_LEFT]) updated_player.dx = -1;
+        if (keyboard_state[SDL_SCANCODE_D] || keyboard_state[SDL_SCANCODE_RIGHT]) updated_player.dx = 1;
+
+        // keep diag movement at the same speed as x and y movement
+        if (updated_player.dx != 0 && updated_player.dy != 0) {
+            float length = sqrt(updated_player.dx * updated_player.dx + updated_player.dy * updated_player.dy);
+            updated_player.dx /= length;
+            updated_player.dy /= length;
+        }
+
+        // update global player
+        *player = updated_player;
     }
-
-    // update global player
-    *player = updated_player;
+    
 }
 
 void update_game(GameState* game){
@@ -91,6 +99,15 @@ void update_game(GameState* game){
     update_particles(&game->particles, game->delta_time);
 }
 
+void render_start_screen(GameState* game){
+    // SDL_SetRenderDrawColor(game->renderer, 0, 0, 50, 175);
+    SDL_RenderClear(game->renderer);
+    SDL_SetRenderDrawColor(game->renderer, 0, 255, 255, 175); // {000, 255, 255}
+    SDL_Rect start_button_rect = {WINDOW_WIDTH / 2 - 100, WINDOW_HEIGHT / 2 - 25, 200, 50};
+    SDL_RenderDrawRect(game->renderer, &start_button_rect);
+    // TODO: get the DLFttf to render text
+}
+
 void render_border(GameState* game){
     SDL_SetRenderDrawColor(game->renderer, 0, 255, 255, 75); // color border
 
@@ -106,11 +123,16 @@ void render_border(GameState* game){
 }
 
 void render_game(GameState* game){
-    SDL_SetRenderDrawColor(game->renderer, 0, 0, 0, 255); // Set colot
+    SDL_SetRenderDrawColor(game->renderer, 0, 0, 0, 255); // Set colot 
     SDL_RenderClear(game->renderer); // clear Screen
-    render_border(game); // render border
-    render_particles(&game->particles, game->renderer); // pender particles
-    render_player_cube(&game->player, game->renderer); // render player
+    if(game->mode == STATE_START_SCREEN){
+        render_start_screen(game);
+    }else if (game->mode == STATE_PLAYING){
+        render_border(game); // render border
+        render_particles(&game->particles, game->renderer); // pender particles
+        render_player_cube(&game->player, game->renderer); // render player
+    }
+    
     SDL_RenderPresent(game->renderer); // present render
 
     // order matters here
@@ -170,6 +192,7 @@ bool init_game(GameState* game){
 
     // game state variables
     game->running = true;
+    game->mode = STATE_START_SCREEN;
     game->last_frame_time = SDL_GetTicks() / FRAME_TARGET_TIME;
     game->delta_time = 0.0;
     game->score = 0; 

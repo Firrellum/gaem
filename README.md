@@ -16,14 +16,14 @@ Game aims and caps at 120 FPS
 
 ## Controls
 
+- `ENTER` : Start game
 - `ESC`: Close the window
 - `WSAD || ARROWS` : Move cube 
 
 ## Future Improvements
 
 - Add enemy AI
-- Border
-- UI 
+- UI | SDL_ttf
 
 ---
 
