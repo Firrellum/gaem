@@ -7,6 +7,7 @@
 #include <time.h>
 #include "constants.h"
 #include "entities.h"
+#include "player.h"
 
 FILE *file;
 
@@ -45,6 +46,7 @@ void handle_inputs(GameState* game){
 void render_game(GameState* game){
     SDL_SetRenderDrawColor(game->renderer, 0, 0, 0, 255); // Set colot
     SDL_RenderClear(game->renderer); // Clear Screen
+    render_player_cube(&game->player, game->renderer);
     SDL_RenderPresent(game->renderer); // Present render
 }
 
@@ -55,7 +57,14 @@ void calculate_delta_time(GameState* game){
 }
 
 void setup(GameState* game){
-
+    // set up the cube init variables
+    game->player.x = WINDOW_WIDTH / 2 - PLAYER_SIZE / 2;
+    game->player.y = WINDOW_HEIGHT / 2 - PLAYER_SIZE / 2;
+    game->player.size = PLAYER_SIZE;
+    game->player.dx = 0;
+    game->player.dy = 0;
+    game->player.alive = true;
+    write_to_file("Spawn cube.");
 
 }
 
@@ -91,6 +100,7 @@ bool init_game(GameState* game){
     // Enable alpha blending for the particles
     SDL_SetRenderDrawBlendMode(game->renderer, SDL_BLENDMODE_BLEND);
 
+    // game state variables
     game->running = true;
     game->last_frame_time = SDL_GetTicks() / FRAME_TARGET_TIME;
     game->delta_time = 0.0;
@@ -110,7 +120,7 @@ int main(int argc, char *argv[]){
         return 1;
     }
 
-    // setup(&game)
+    setup(&game); // spawn Fcube
 
     // game loop
     while(game.running){
