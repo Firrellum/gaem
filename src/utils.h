@@ -15,6 +15,7 @@ typedef struct {
 typedef enum {
     STATE_START_SCREEN,
     STATE_PLAYING,
+    STATE_PAUSED,
 } GameMode;
 
 

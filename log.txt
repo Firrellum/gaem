@@ -4,7 +4,15 @@ Initialized SDL_TTF.
 Font loaded
 Created window.
 Created renderer.
-Spawn cube.
+Spawn cube and menus.
+Settings selected (not implemented yet).
+Settings selected (not implemented yet).
+Settings selected (not implemented yet).
+Settings selected (not implemented yet).
+Settings selected (not implemented yet).
+Settings selected (not implemented yet).
+Settings selected (not implemented yet).
+Settings selected (not implemented yet).
 Destroying renderer.
 Destroying widow.
 Closing ttf.

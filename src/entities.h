@@ -31,6 +31,19 @@ typedef struct {
     float spawn_timer;       
 } ParticleSystem;
 
+// menu options
+typedef struct {
+    const char* text;  
+    bool selected;     
+} MenuOption;
+
+// menu placeholder
+typedef struct {
+    MenuOption options[4];  
+    int option_count;       
+    int selected_index;     
+} PauseMenu;
+
 // game state
 typedef struct GameState {
     SDL_Window* window;
@@ -45,7 +58,10 @@ typedef struct GameState {
     ParticleSystem particles;
     // Color border_color;
     GameMode mode;
+    PauseMenu pause_menu;
+    float menu_cooldown;
 } GameState;
+
 
 
 #endif 

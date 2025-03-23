@@ -17,5 +17,7 @@
 #define PARTICLE_SPEED 100.0f  
 #define SPAWN_RATE 0.016f     
 
+#define MENU_DELAY 0.2f
+
 
 #endif

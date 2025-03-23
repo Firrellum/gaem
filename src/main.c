@@ -43,22 +43,34 @@ void cleanup_and_quit(GameState* game, TTF_Font* font){
     SDL_Quit();
 }
 
-void handle_inputs(GameState* game, Player* player){
+void handle_inputs(GameState* game, Player* player) {
     SDL_Event event;
 
-    // exit on escape
-    while(SDL_PollEvent(&event)){
-        if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_ESCAPE){
-            game->running = false;
-        }
-        if (game->mode == STATE_START_SCREEN && event.key.keysym.sym == SDLK_RETURN) {
-            game->mode = STATE_PLAYING; // Switch to gameplay when Enter is pressed
+    while (SDL_PollEvent(&event)) {
+        if (event.type == SDL_KEYDOWN) {
+            if (event.key.keysym.sym == SDLK_ESCAPE) {
+                if (game->mode == STATE_PLAYING) {
+                    game->mode = STATE_PAUSED;  // pause on escape
+                    player->dx = 0; //
+                    player->dy = 0; // stop cube moving on menu
+                } else if (game->mode == STATE_PAUSED) {
+                    game->mode = STATE_PLAYING; // unpause on escape
+                }
+            }
+            // start on enter
+            if (game->mode == STATE_START_SCREEN && event.key.keysym.sym == SDLK_RETURN) {
+                game->mode = STATE_PLAYING;  
+            }
+            // quit on escape from start screen or desktop option
+            if ((game->mode == STATE_START_SCREEN && event.key.keysym.sym == SDLK_ESCAPE) ||
+                (game->mode == STATE_PAUSED && game->pause_menu.selected_index == 3 && event.key.keysym.sym == SDLK_RETURN)) {
+                game->running = false;
+            }
         }
     }
 
-
-    if(game->mode == STATE_PLAYING){
-        // get keyboard state
+    if (game->mode == STATE_PLAYING) {
+         // get keyboard state
         const Uint8* keyboard_state = SDL_GetKeyboardState(NULL);
         // scope player
         Player updated_player = *player;
@@ -76,11 +88,54 @@ void handle_inputs(GameState* game, Player* player){
             updated_player.dx /= length;
             updated_player.dy /= length;
         }
-
         // update global player
         *player = updated_player;
+
+    } else if (game->mode == STATE_PAUSED) {
+        // get kb state
+        const Uint8* keyboard_state = SDL_GetKeyboardState(NULL);
+
+        const float MENU_DELAY_LOCAL = MENU_DELAY;
+        // decreae cooldown per fram
+        if (game->menu_cooldown > 0){
+            game->menu_cooldown -= game->delta_time;
+        }
+        // move selection with up arrow keys
+        if (keyboard_state[SDL_SCANCODE_UP] && game->pause_menu.selected_index > 0 && game->menu_cooldown <= 0) {
+            game->pause_menu.options[game->pause_menu.selected_index].selected = false; // deselect current
+            game->pause_menu.selected_index--; // move selection up
+            game->pause_menu.options[game->pause_menu.selected_index].selected = true; // select new option
+            game->menu_cooldown = MENU_DELAY_LOCAL;
+            // printf("Moving up, %i.", game->pause_menu.selected_index );
+        } // or move selection with down key
+        if (keyboard_state[SDL_SCANCODE_DOWN] && game->pause_menu.selected_index < game->pause_menu.option_count - 1 && game->menu_cooldown <= 0) {
+            game->pause_menu.options[game->pause_menu.selected_index].selected = false; // "
+            game->pause_menu.selected_index++; // "
+            game->pause_menu.options[game->pause_menu.selected_index].selected = true; //
+            game->menu_cooldown = MENU_DELAY_LOCAL;
+            // printf("Moving down, %i.", game->pause_menu.selected_index ); 
+        }
+        // confirm selection w enter
+        if (keyboard_state[SDL_SCANCODE_RETURN]) {
+            switch (game->pause_menu.selected_index) {
+                case 0:  // resume 0
+                    game->mode = STATE_PLAYING;
+                    break;
+                case 1:  // settings
+                    write_to_file("Settings selected (not implemented yet).");
+                    break;
+                case 2:  // quit to main 2
+                    // reset cube and particles
+                    game->mode = STATE_START_SCREEN;
+                    game->player.x = WINDOW_WIDTH / 2 - PLAYER_SIZE / 2;  
+                    game->player.y = WINDOW_HEIGHT / 2 - PLAYER_SIZE / 2;
+                    game->particles.count = 0;  
+                    break;
+                case 3:  // qtd 3
+                    break;
+            }
+        }
     }
-    
 }
 
 void update_game(GameState* game){
@@ -95,15 +150,17 @@ void update_game(GameState* game){
     // update player
     update_player(&game->player, game->delta_time);
 
-    // particles | spawn on move
-    if (game->particles.spawn_timer >= SPAWN_RATE){
-        game->particles.spawn_timer = 0;
-        if((game->player.dx != 0 || game->player.dy != 0)){
-            spawn_particle(&game->particles, &game->player);
+    // particles | spawn on move | only update while in playing state
+    if (game->mode == STATE_PLAYING) {  
+        update_player(&game->player, game->delta_time);
+        if (game->particles.spawn_timer >= SPAWN_RATE) {
+            game->particles.spawn_timer = 0;
+            if (game->player.dx != 0 || game->player.dy != 0) {
+                spawn_particle(&game->particles, &game->player);
+            }
         }
+        update_particles(&game->particles, game->delta_time);
     }
-    // update spawend particles
-    update_particles(&game->particles, game->delta_time);
 }
 
 void render_text_at(SDL_Renderer* renderer, SDL_Texture* texture, int x, int y) {
@@ -159,6 +216,21 @@ void render_border(GameState* game){
     
 }
 
+void render_pause_menu(GameState* game, TTF_Font* font) {
+    // color highlights and main
+    SDL_Color selected_color = {0, 255, 255, 255};  
+    SDL_Color unselected_color = {255, 255, 255, 255};  
+
+    int y_offset = WINDOW_HEIGHT / 2 - (game->pause_menu.option_count * 50) / 2;  // menu pos
+    // loop for each item
+    for (int i = 0; i < game->pause_menu.option_count; i++) {
+        SDL_Color color = game->pause_menu.options[i].selected ? selected_color : unselected_color;
+        SDL_Texture* option_texture = render_text(game->renderer, game->pause_menu.options[i].text, font, color);
+        render_text_at(game->renderer, option_texture, WINDOW_WIDTH / 2, y_offset + i * 50);
+        SDL_DestroyTexture(option_texture);  // cleaning
+    }
+}
+
 void render_game(GameState* game, TTF_Font* font){
     SDL_SetRenderDrawColor(game->renderer, 0, 0, 0, 255); // Set colot 
     SDL_RenderClear(game->renderer); // clear Screen
@@ -170,6 +242,11 @@ void render_game(GameState* game, TTF_Font* font){
         render_border(game); // render border
         render_particles(&game->particles, game->renderer); // pender particles
         render_player_cube(&game->player, game->renderer); // render player
+    } else if (game->mode == STATE_PAUSED) {
+        render_border(game);
+        render_particles(&game->particles, game->renderer);  // keep particles visible but frozen
+        render_player_cube(&game->player, game->renderer);
+        render_pause_menu(game, font);  // overlay the pause menu
     }
     
     SDL_RenderPresent(game->renderer); // present render
@@ -193,7 +270,17 @@ void setup(GameState* game){
     game->player.alive = true;
     game->player.speed = MOVE_SPEED;
 
-    write_to_file("Spawn cube.");
+    game->pause_menu.options[0] = (MenuOption){"Resume", false};
+    game->pause_menu.options[1] = (MenuOption){"Settings", false};
+    game->pause_menu.options[2] = (MenuOption){"Quit to Main Menu", false};
+    game->pause_menu.options[3] = (MenuOption){"Quit to Desktop", false};
+    game->pause_menu.option_count = 4;
+    game->pause_menu.selected_index = 0;  // starting option 
+    game->pause_menu.options[game->pause_menu.selected_index].selected = true;
+    
+    game->menu_cooldown = 0.0f;
+
+    write_to_file("Spawn cube and menus.");
 
 }
 
