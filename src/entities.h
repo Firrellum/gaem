@@ -60,6 +60,7 @@ typedef struct GameState {
     GameMode mode;
     PauseMenu pause_menu;
     float menu_cooldown;
+    float paused_dx, paused_dy;
 } GameState;
 
 

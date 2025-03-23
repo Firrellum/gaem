@@ -6,13 +6,6 @@ Created window.
 Created renderer.
 Spawn cube and menus.
 Settings selected (not implemented yet).
-Settings selected (not implemented yet).
-Settings selected (not implemented yet).
-Settings selected (not implemented yet).
-Settings selected (not implemented yet).
-Settings selected (not implemented yet).
-Settings selected (not implemented yet).
-Settings selected (not implemented yet).
 Destroying renderer.
 Destroying widow.
 Closing ttf.

@@ -33,7 +33,7 @@ void write_to_file(const char* text){
 void cleanup_and_quit(GameState* game, TTF_Font* font){
     write_to_file("Destroying renderer.");
     SDL_DestroyRenderer(game->renderer);
-    write_to_file("Destroying widow.");
+    write_to_file("Destroying window.");
     SDL_DestroyWindow(game->window);
     write_to_file("Closing ttf.");
     TTF_CloseFont(font);
@@ -51,10 +51,14 @@ void handle_inputs(GameState* game, Player* player) {
             if (event.key.keysym.sym == SDLK_ESCAPE) {
                 if (game->mode == STATE_PLAYING) {
                     game->mode = STATE_PAUSED;  // pause on escape
+                    game->paused_dx = player->dx;
+                    game->paused_dy = player->dy; // stor velocity
                     player->dx = 0; //
                     player->dy = 0; // stop cube moving on menu
                 } else if (game->mode == STATE_PAUSED) {
                     game->mode = STATE_PLAYING; // unpause on escape
+                    player->dx = game->paused_dx;
+                    player->dy = game->paused_dy; // restore velocity
                 }
             }
             // start on enter
@@ -116,7 +120,7 @@ void handle_inputs(GameState* game, Player* player) {
             // printf("Moving down, %i.", game->pause_menu.selected_index ); 
         }
         // confirm selection w enter
-        if (keyboard_state[SDL_SCANCODE_RETURN]) {
+        if (keyboard_state[SDL_SCANCODE_RETURN] && game->menu_cooldown <= 0) {
             switch (game->pause_menu.selected_index) {
                 case 0:  // resume 0
                     game->mode = STATE_PLAYING;
@@ -134,6 +138,7 @@ void handle_inputs(GameState* game, Player* player) {
                 case 3:  // qtd 3
                     break;
             }
+            game->menu_cooldown = MENU_DELAY_LOCAL;
         }
     }
 }
