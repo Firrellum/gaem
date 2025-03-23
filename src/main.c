@@ -20,6 +20,7 @@ void calculate_delta_time(GameState* game);
 void render_game(GameState* game, TTF_Font* font);
 void render_start_screen(GameState* game, TTF_Font* font);
 SDL_Texture* render_text(SDL_Renderer* renderer, const char* text, TTF_Font* font, SDL_Color fg);
+void render_text_at(SDL_Renderer* renderer, SDL_Texture* texture, int x, int y);
 void render_border(GameState* game);
 void update_game(GameState* game);
 void handle_inputs(GameState* game, Player* player);
@@ -105,32 +106,43 @@ void update_game(GameState* game){
     update_particles(&game->particles, game->delta_time);
 }
 
-void render_start_screen(GameState* game, TTF_Font* font){
-    // SDL_SetRenderDrawColor(game->renderer, 0, 0, 50, 175);
-    SDL_Color fg = {0, 255, 255, 100};
-    // SDL_Color bg = {0, 255, 255, 75};
-    SDL_Texture* text_texture = render_text(game->renderer, "ENTER to Start", game->font, fg);
-    
-    int text_width, text_height;
-    SDL_QueryTexture(text_texture, NULL, NULL, &text_width, &text_height);
+void render_text_at(SDL_Renderer* renderer, SDL_Texture* texture, int x, int y) {
+    // check the texture
+    if (!texture) return; 
 
-    SDL_SetRenderDrawColor(game->renderer, 0, 255, 255, 75);
-    SDL_Rect start_button_rect = {WINDOW_WIDTH / 2 - 100, WINDOW_HEIGHT / 2 - 25, 200, 50};
-    SDL_RenderFillRect(game->renderer, &start_button_rect); 
+    // get dimentions
+    int text_width, text_height;
+    SDL_QueryTexture(texture, NULL, NULL, &text_width, &text_height);
 
     SDL_Rect text_rect = {
-        start_button_rect.x + (start_button_rect.w - text_width / 2) / 2, 
-        start_button_rect.y + (start_button_rect.h - text_height / 2) / 2, 
-        text_width / 2,  
-        text_height / 2  
+        x - text_width / 2,  
+        y - text_height / 2, 
+        text_width,
+        text_height
     };
-   
-    SDL_RenderCopy(game->renderer, text_texture, NULL, &text_rect);
-   
-    SDL_SetRenderDrawColor(game->renderer, 255, 255, 255, 255);  
-    SDL_RenderDrawRect(game->renderer, &start_button_rect);
-   
+
+    // draw the texture
+    SDL_RenderCopy(renderer, texture, NULL, &text_rect);
 }
+
+void render_start_screen(GameState* game, TTF_Font* font) {
+    // set colours
+    SDL_Color button_color = {255, 255, 255, 255};
+    SDL_Color title_color = {0, 255, 255, 255};
+
+    // create the textures with the fonts
+    SDL_Texture* game_title_texture = render_text(game->renderer, "F Cubed (f³)", font, title_color);
+    SDL_Texture* button_text_texture = render_text(game->renderer, "ENTER to Start", font, button_color);
+
+    // render 'button'
+    render_text_at(game->renderer, button_text_texture, WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2);
+
+    // render title text
+    render_text_at(game->renderer, game_title_texture, WINDOW_WIDTH / 2, 100);
+
+    // TODO refactor the repetition here
+}
+
 
 void render_border(GameState* game){
     SDL_SetRenderDrawColor(game->renderer, 0, 255, 255, 75); // color border
