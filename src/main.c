@@ -1,4 +1,5 @@
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_ttf.h>
 #include <stdio.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -8,29 +9,34 @@
 #include "constants.h"
 #include "entities.h"
 #include "player.h"
+#include "utils.h"
 
 FILE *file; // use write_to_file(); to output to the log.txt
- 
+
 bool init_game(GameState* game);
 void write_to_file(const char *text);
 void setup(GameState* game);
 void calculate_delta_time(GameState* game);
-void render_game(GameState* game);
-void render_start_screen(GameState* game);
+void render_game(GameState* game, TTF_Font* font);
+void render_start_screen(GameState* game, TTF_Font* font);
+SDL_Texture* render_text(SDL_Renderer* renderer, const char* text, TTF_Font* font, SDL_Color fg);
 void render_border(GameState* game);
 void update_game(GameState* game);
 void handle_inputs(GameState* game, Player* player);
-void cleanup_and_quit(GameState* game);
+void cleanup_and_quit(GameState* game, TTF_Font* font);
 
 void write_to_file(const char* text){
     fprintf(file,"%s\n", text);
 }
 
-void cleanup_and_quit(GameState* game){
+void cleanup_and_quit(GameState* game, TTF_Font* font){
     write_to_file("Destroying renderer.");
     SDL_DestroyRenderer(game->renderer);
     write_to_file("Destroying widow.");
     SDL_DestroyWindow(game->window);
+    write_to_file("Closing ttf.");
+    TTF_CloseFont(font);
+    TTF_Quit();
     write_to_file("Exiting..0/");
     fclose(file);
     SDL_Quit();
@@ -99,13 +105,31 @@ void update_game(GameState* game){
     update_particles(&game->particles, game->delta_time);
 }
 
-void render_start_screen(GameState* game){
+void render_start_screen(GameState* game, TTF_Font* font){
     // SDL_SetRenderDrawColor(game->renderer, 0, 0, 50, 175);
-    SDL_RenderClear(game->renderer);
-    SDL_SetRenderDrawColor(game->renderer, 0, 255, 255, 175); // {000, 255, 255}
+    SDL_Color fg = {0, 255, 255, 100};
+    // SDL_Color bg = {0, 255, 255, 75};
+    SDL_Texture* text_texture = render_text(game->renderer, "ENTER to Start", game->font, fg);
+    
+    int text_width, text_height;
+    SDL_QueryTexture(text_texture, NULL, NULL, &text_width, &text_height);
+
+    SDL_SetRenderDrawColor(game->renderer, 0, 255, 255, 75);
     SDL_Rect start_button_rect = {WINDOW_WIDTH / 2 - 100, WINDOW_HEIGHT / 2 - 25, 200, 50};
+    SDL_RenderFillRect(game->renderer, &start_button_rect); 
+
+    SDL_Rect text_rect = {
+        start_button_rect.x + (start_button_rect.w - text_width / 2) / 2, 
+        start_button_rect.y + (start_button_rect.h - text_height / 2) / 2, 
+        text_width / 2,  
+        text_height / 2  
+    };
+   
+    SDL_RenderCopy(game->renderer, text_texture, NULL, &text_rect);
+   
+    SDL_SetRenderDrawColor(game->renderer, 255, 255, 255, 255);  
     SDL_RenderDrawRect(game->renderer, &start_button_rect);
-    // TODO: get the DLFttf to render text
+   
 }
 
 void render_border(GameState* game){
@@ -122,11 +146,13 @@ void render_border(GameState* game){
     
 }
 
-void render_game(GameState* game){
+void render_game(GameState* game, TTF_Font* font){
     SDL_SetRenderDrawColor(game->renderer, 0, 0, 0, 255); // Set colot 
     SDL_RenderClear(game->renderer); // clear Screen
+    
     if(game->mode == STATE_START_SCREEN){
-        render_start_screen(game);
+        render_start_screen(game, font);
+        render_border(game); // render border
     }else if (game->mode == STATE_PLAYING){
         render_border(game); // render border
         render_particles(&game->particles, game->renderer); // pender particles
@@ -168,6 +194,17 @@ bool init_game(GameState* game){
         return false;
     } else { write_to_file("Initialized SDL | VIDEO");};
 
+    if (TTF_Init() == -1){
+        write_to_file("Error initializing SDL_TTF.");
+        return false;
+    } else { write_to_file("Initialized SDL_TTF.");};
+
+    game->font = TTF_OpenFont("./src/assets/font.ttf", 48);
+    if(!game->font){
+        write_to_file("Error loading font.");
+        // return false;
+    }else{ write_to_file("Font loaded");};
+
     game->window = SDL_CreateWindow(
         NULL, // window name
         SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, // window screen position
@@ -189,6 +226,7 @@ bool init_game(GameState* game){
 
     // Enable alpha blending for the particles
     SDL_SetRenderDrawBlendMode(game->renderer, SDL_BLENDMODE_BLEND);
+    SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1");
 
     // game state variables
     game->running = true;
@@ -217,11 +255,25 @@ int main(int argc, char *argv[]){
     while(game.running){
         handle_inputs(&game, &game.player); // handle inputs
         update_game(&game); // update game
-        render_game(&game); // render game
+        render_game(&game, game.font); // render game
         
     }
 
-    cleanup_and_quit(&game);
+    cleanup_and_quit(&game, game.font);
     return 0;
 }
 
+SDL_Texture* render_text(SDL_Renderer* renderer, const char* text, TTF_Font* font, SDL_Color fg){
+    SDL_Surface* text_surface = TTF_RenderText_Blended(font, text, fg);
+    if (!text_surface) {
+        return NULL;
+    }
+
+    SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, text_surface);
+    SDL_FreeSurface(text_surface);
+    if (!texture) {
+    }
+
+    SDL_SetTextureScaleMode(texture, SDL_ScaleModeLinear);
+    return texture;
+}

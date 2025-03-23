@@ -35,6 +35,7 @@ typedef struct {
 typedef struct GameState {
     SDL_Window* window;
     SDL_Renderer* renderer;
+    TTF_Font* font; 
     bool running;
     double delta_time;
     double last_frame_time;

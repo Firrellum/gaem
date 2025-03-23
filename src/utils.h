@@ -2,6 +2,7 @@
 #define UTILS_H
 
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_ttf.h>
 #include <stdbool.h>
 
 typedef struct {
@@ -15,5 +16,6 @@ typedef enum {
     STATE_START_SCREEN,
     STATE_PLAYING,
 } GameMode;
+
 
 #endif

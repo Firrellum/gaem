@@ -1,8 +1,11 @@
 Hello Game!
 Initialized SDL | VIDEO
+Initialized SDL_TTF.
+Font loaded
 Created window.
 Created renderer.
 Spawn cube.
 Destroying renderer.
 Destroying widow.
+Closing ttf.
 Exiting..0/
