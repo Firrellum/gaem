@@ -141,8 +141,9 @@ void render_start_screen(GameState* game, TTF_Font* font) {
     render_text_at(game->renderer, game_title_texture, WINDOW_WIDTH / 2, 100);
 
     // TODO refactor the repetition here
+    SDL_DestroyTexture(game_title_texture);
+    SDL_DestroyTexture(button_text_texture);
 }
-
 
 void render_border(GameState* game){
     SDL_SetRenderDrawColor(game->renderer, 0, 255, 255, 75); // color border
@@ -214,7 +215,7 @@ bool init_game(GameState* game){
     game->font = TTF_OpenFont("./src/assets/font.ttf", 48);
     if(!game->font){
         write_to_file("Error loading font.");
-        // return false;
+        return false;
     }else{ write_to_file("Font loaded");};
 
     game->window = SDL_CreateWindow(
@@ -252,7 +253,7 @@ bool init_game(GameState* game){
 }
 
 int main(int argc, char *argv[]){
-    // srand(time(NULL));
+    srand(time(NULL));
 
     // create a new gamestate with no defined parameters
     GameState game = {0};
@@ -284,6 +285,8 @@ SDL_Texture* render_text(SDL_Renderer* renderer, const char* text, TTF_Font* fon
     SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, text_surface);
     SDL_FreeSurface(text_surface);
     if (!texture) {
+        write_to_file("Error creating texture from surface.");
+        return NULL;
     }
 
     SDL_SetTextureScaleMode(texture, SDL_ScaleModeLinear);

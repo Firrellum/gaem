@@ -18,10 +18,10 @@ void update_player(Player* player, float delta_time) {
     player->y += player->dy * player->speed * delta_time;
 
     // Keep player within screen boundaries
-    if (player->x < 0) player->x = 0;
-    if (player->x > WINDOW_WIDTH - player->size) player->x = WINDOW_WIDTH - player->size;
-    if (player->y < 0) player->y = 0;
-    if (player->y > WINDOW_HEIGHT - player->size) player->y = WINDOW_HEIGHT - player->size;
+    if (player->x < BORDER_SIZE) player->x = BORDER_SIZE;
+    if (player->x > WINDOW_WIDTH - player->size - BORDER_SIZE) player->x = WINDOW_WIDTH - player->size - BORDER_SIZE;
+    if (player->y < BORDER_SIZE) player->y = BORDER_SIZE;
+    if (player->y > WINDOW_HEIGHT - player->size - BORDER_SIZE) player->y = WINDOW_HEIGHT - player->size - BORDER_SIZE;
     
 }
 
