@@ -4,9 +4,9 @@ Initialized SDL_TTF.
 Font loaded
 Created window.
 Created renderer.
+Failed to load F icon.
 Spawn cube and menus.
-Settings selected (not implemented yet).
 Destroying renderer.
-Destroying widow.
+Destroying window.
 Closing ttf.
 Exiting..0/

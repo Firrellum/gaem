@@ -1,8 +1,17 @@
-build:
-	gcc -Wall -std=c99 ./src/*.c -lmingw32 -lSDL2main -lSDL2 -lSDL2_ttf -o game
+COMPILER = gcc
+COMPILERFLAGS = -Wall -std=c99
+LDFLAGS = -mwindows -lmingw32 -lSDL2main -lSDL2 -lSDL2_ttf -lSDL2_image
+SOURCES = ./src/main.c ./src/player.c  
+EXECUTABLE = Fcubed.exe
+
+build: resource.o
+	$(COMPILER) $(COMPILERFLAGS) $(SOURCES) resource.o $(LDFLAGS) -o $(EXECUTABLE)
+
+resource.o: src/resource.rc
+	windres src/resource.rc -O coff -o resource.o
 
 run:
-	./game
+	./$(EXECUTABLE)
 
 clean:
-	rm game
+	rm -f $(EXECUTABLE) resource.o

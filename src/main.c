@@ -1,5 +1,6 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
+#include <SDL2/SDL_image.h>
 #include <stdio.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -328,6 +329,14 @@ bool init_game(GameState* game){
         write_to_file("Error creating SDL renderer!");
         return false;
     }else{ write_to_file("Created renderer.");};
+
+    SDL_Surface* icon = IMG_Load("./src/assets/F_icon_transparent.ico");
+    if (!icon){
+        write_to_file("Failed to load F icon.");
+    }else{write_to_file("F Icon loaded.");};
+
+    SDL_SetWindowIcon(game->window, icon);
+    SDL_FreeSurface(icon);
 
     // Enable alpha blending for the particles
     SDL_SetRenderDrawBlendMode(game->renderer, SDL_BLENDMODE_BLEND);
