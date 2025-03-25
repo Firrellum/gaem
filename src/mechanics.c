@@ -103,6 +103,13 @@ void update_line_enemies(GameState* game) {
             }
         }
 
+        // Collision with player
+        float dx = line->end_x - line->start_x;
+        float dy = line->end_y - line->start_y;
+        float length = sqrt(dx * dx + dy * dy);
+        if (length == 0) continue; // Avoid division by zero
+
+        // Create base rectangle for the line
         SDL_Rect line_rect = {(int)line->start_x, (int)line->start_y, 
                               (int)(line->end_x - line->start_x), (int)(line->end_y - line->start_y)};
         if (line_rect.w < 0) {
@@ -113,10 +120,39 @@ void update_line_enemies(GameState* game) {
             line_rect.y += line_rect.h;
             line_rect.h = -line_rect.h;
         }
+
+        // Expand the rectangle to match visual thickness
+        int thickness = 3; // Same as in render_line_enemies()
+        float perp_x = -dy / length; // Perpendicular vector: (-dy, dx)
+        float perp_y = dx / length;
+        // Adjust position and size to expand in the perpendicular direction
+        int offset_x = (int)(perp_x * thickness);
+        int offset_y = (int)(perp_y * thickness);
+        line_rect.x -= offset_x;
+        line_rect.y -= offset_y;
+        line_rect.w += 2 * offset_x;
+        line_rect.h += 2 * offset_y;
+
+        // Ensure w and h are positive after expansion
+        if (line_rect.w < 0) {
+            line_rect.x += line_rect.w;
+            line_rect.w = -line_rect.w;
+        }
+        if (line_rect.h < 0) {
+            line_rect.y += line_rect.h;
+            line_rect.h = -line_rect.h;
+        }
+
+        // Debug: Print collision rectangle
+        printf("Line %d collision rect: x=%d, y=%d, w=%d, h=%d\n", 
+               i, line_rect.x, line_rect.y, line_rect.w, line_rect.h);
+
+        // Check collision with player
         if (game->player.x < line_rect.x + line_rect.w &&
             game->player.x + game->player.size > line_rect.x &&
             game->player.y < line_rect.y + line_rect.h &&
             game->player.y + game->player.size > line_rect.y) {
+            printf("Player hit line %d - Game Over\n", i);
             game->game_over = true;
         }
     }
@@ -128,7 +164,19 @@ void render_line_enemies(GameState* game) {
         if (!line->active) continue;
 
         SDL_SetRenderDrawColor(game->renderer, 224, 16, 186, 255);
-        SDL_RenderDrawLine(game->renderer, (int)line->start_x, (int)line->start_y, 
-                           (int)line->end_x, (int)line->end_y);
+        int thickness = 3; // Same as in update_line_enemies()
+        for (int offset = -thickness; offset <= thickness; offset++) {
+            float dx = line->end_x - line->start_x;
+            float dy = line->end_y - line->start_y;
+            float length = sqrt(dx * dx + dy * dy);
+            if (length == 0) continue;
+            float perp_x = -dy / length;
+            float perp_y = dx / length;
+            int start_x = (int)(line->start_x + perp_x * offset);
+            int start_y = (int)(line->start_y + perp_y * offset);
+            int end_x = (int)(line->end_x + perp_x * offset);
+            int end_y = (int)(line->end_y + perp_y * offset);
+            SDL_RenderDrawLine(game->renderer, start_x, start_y, end_x, end_y);
+        }
     }
 }
