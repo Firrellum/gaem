@@ -21,7 +21,7 @@ This is a simple game side project built using SDL2 in C, designed as a learning
 ## Controls
 
 - **Start Screen**:
-  - `ENTER`: Start the game.
+  - `ENTER`: Start the game..
   - `ESC`: Quit to desktop.
 - **Playing State**:
   - `WASD` or `Arrow Keys`: Move the player cube (up, down, left, right).
