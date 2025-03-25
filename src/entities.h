@@ -53,6 +53,20 @@ typedef struct{
     UiOptions options[2];
 } UiInfoScreen;
 
+typedef struct {
+    float x, y;           
+    int size;             
+    bool active;          
+} Collectible;
+
+// Enemy data
+typedef struct {
+    float x, y;           
+    int size;             
+    float speed;          
+    bool active;          
+} Enemy;
+
 // game state
 typedef struct GameState {
     SDL_Window* window;
@@ -72,6 +86,9 @@ typedef struct GameState {
     PauseMenu pause_menu;
     float menu_cooldown;
     float paused_dx, paused_dy;
+    Collectible collectibles[5];
+    int collectible_count;
+    Enemy enemy;
 } GameState;
 
 

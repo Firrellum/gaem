@@ -67,6 +67,7 @@ void handle_inputs(GameState* game, Player* player) {
             }
             // start on enter
             if (game->mode == STATE_START_SCREEN && event.key.keysym.sym == SDLK_RETURN) {
+                // printf("Entering STATE_PLAYING\n");
                 game->mode = STATE_PLAYING;  
             }
             // quit on escape from start screen or desktop option
@@ -156,131 +157,25 @@ void update_game(GameState* game){
     // calculate delta time
     calculate_delta_time(game);
     
-    // update player
-    update_player(&game->player, game->delta_time);
-
+    // update playe
     // particles | spawn on move | only update while in playing state
-    if (game->mode == STATE_PLAYING) {  
+    if (game->mode == STATE_PLAYING && !game->game_over) {
+        // printf("Updating player\n");
         update_player(&game->player, game->delta_time);
+        // printf("Updating collectibles\n");
+        update_collectibles(game);
+        // printf("Updating enemy\n");
+        update_enemy(game);
         if (game->particles.spawn_timer >= SPAWN_RATE) {
             game->particles.spawn_timer = 0;
             if (game->player.dx != 0 || game->player.dy != 0) {
+                // printf("Spawning particle\n");
                 spawn_particle(&game->particles, &game->player);
             }
         }
+        // printf("Updating particles\n");
         update_particles(&game->particles, game->delta_time);
     }
-}
-
-void render_text_at(SDL_Renderer* renderer, SDL_Texture* texture, int x, int y) {
-    // check the texture
-    if (!texture) return; 
-
-    // get dimentions
-    int text_width, text_height;
-    SDL_QueryTexture(texture, NULL, NULL, &text_width, &text_height);
-
-    SDL_Rect text_rect = {
-        x - text_width / 2,  
-        y - text_height / 2, 
-        text_width,
-        text_height
-    };
-
-    // draw the texture
-    SDL_RenderCopy(renderer, texture, NULL, &text_rect);
-}
-
-void render_gameplay_ui(GameState* game){
-    SDL_Color ui_color = {255,255,255,255};
-
-    SDL_Texture* player_score_texture = render_text(game->renderer, "Score :", game->ui_font, ui_color);
-    SDL_Texture* player_hp_texture = render_text(game->renderer, "HP :", game->ui_font, ui_color);
-
-    render_text_at(game->renderer, player_score_texture, 130, 30); 
-    render_text_at(game->renderer, player_hp_texture, 400, 30); 
-
-    SDL_DestroyTexture(player_score_texture);
-    SDL_DestroyTexture(player_hp_texture);
-}
-
-void render_start_screen(GameState* game) {
-    // set colours
-    SDL_Color button_color = {255, 255, 255, 255};
-    SDL_Color title_color = {0, 255, 255, 255};
-
-    // create the textures with the fonts
-    SDL_Texture* game_title_texture = render_text(game->renderer, "F Cubed (f³)", game->font, title_color);
-    SDL_Texture* button_text_texture = render_text(game->renderer, "ENTER to Start", game->font, button_color);
-
-    // render 'button'
-    render_text_at(game->renderer, button_text_texture, WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2);
-
-    // render title text
-    render_text_at(game->renderer, game_title_texture, WINDOW_WIDTH / 2, 100);
-
-    // TODO refactor the repetition here
-    SDL_DestroyTexture(game_title_texture);
-    SDL_DestroyTexture(button_text_texture);
-}
-
-void render_border(GameState* game){
-    SDL_SetRenderDrawColor(game->renderer, BORDER_COLOR.r, BORDER_COLOR.g, BORDER_COLOR.b, BORDER_COLOR.a); // color border
-
-    // border || SDL defaults to one pixel wide | for loop
-    for (int i = 0; i < BORDER_SIZE; i++){
-        SDL_Rect border_rect = {i, i, WINDOW_WIDTH - (2 * i), WINDOW_HEIGHT - (2 * i)};
-        SDL_RenderDrawRect(game->renderer, &border_rect);
-    }
-    // SDL_Rect border_rect = {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
-
-    // NEED TO SUPTRACT BORDER FROM PLAYER BOUNDS
-    
-}
-
-void render_pause_menu(GameState* game) {
-    SDL_SetRenderDrawBlendMode(game->renderer, SDL_BLENDMODE_BLEND);
-
-    SDL_SetRenderDrawColor(game->renderer, MENU_BACKDROP.r, MENU_BACKDROP.g, MENU_BACKDROP.b, MENU_BACKDROP.a);
-    SDL_Rect backdrop = {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
-    SDL_RenderFillRect(game->renderer, &backdrop);
-    SDL_RenderClear(game->renderer);
-    // color highlights and main
-    SDL_Color selected_color = SELECTED_COLOR;  
-    SDL_Color unselected_color = BASE_COLOR;  
-
-    int y_offset = WINDOW_HEIGHT / 2 - (game->pause_menu.option_count * 50) / 2;  // menu pos
-    // loop for each item
-    for (int i = 0; i < game->pause_menu.option_count; i++) {
-        SDL_Color color = game->pause_menu.options[i].selected ? selected_color : unselected_color;
-        SDL_Texture* option_texture = render_text(game->renderer, game->pause_menu.options[i].text, game->font, color);
-        render_text_at(game->renderer, option_texture, WINDOW_WIDTH / 2, y_offset + i * 50);
-        SDL_DestroyTexture(option_texture);  // cleaning
-    }
-}
-
-void render_game(GameState* game){
-    SDL_SetRenderDrawColor(game->renderer, 0, 0, 0, 255); // Set colot 
-    SDL_RenderClear(game->renderer); // clear Screen
-    
-    if(game->mode == STATE_START_SCREEN){
-        render_start_screen(game);
-        render_border(game); // render border
-    }else if (game->mode == STATE_PLAYING){
-        render_border(game); // render border
-        render_gameplay_ui(game);
-        render_particles(&game->particles, game->renderer); // pender particles
-        render_player_cube(&game->player, game->renderer); // render player
-    } else if (game->mode == STATE_PAUSED) {
-        render_particles(&game->particles, game->renderer);  // keep particles visible but frozen
-        render_player_cube(&game->player, game->renderer);
-        render_pause_menu(game);  // overlay the pause menu
-        render_border(game);
-    }
-    render_grid_overlay(game); // testing|align grid
-    SDL_RenderPresent(game->renderer); // present render
-   
-    // order matters here
 }
 
 void calculate_delta_time(GameState* game) {
@@ -298,6 +193,10 @@ void setup(GameState* game){
     game->player.dy = 0;
     game->player.alive = true;
     game->player.speed = MOVE_SPEED;
+    game->player.hp = 100;
+    spawn_collectibles(game);
+    spawn_enemy(game);
+   
 
     game->pause_menu.options[0] = (MenuOption){"Resume", false};
     game->pause_menu.options[1] = (MenuOption){"Settings", false};
@@ -385,6 +284,7 @@ bool init_game(GameState* game){
 }
 
 int main(int argc, char *argv[]){
+    // printf("Starting main\n");
     srand(time(NULL));
 
     // create a new gamestate with no defined parameters
@@ -408,33 +308,3 @@ int main(int argc, char *argv[]){
     return 0;
 }
 
-SDL_Texture* render_text(SDL_Renderer* renderer, const char* text, TTF_Font* font, SDL_Color fg){
-    SDL_Surface* text_surface = TTF_RenderText_Blended(font, text, fg);
-    if (!text_surface) {
-        return NULL;
-    }
-
-    SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, text_surface);
-    SDL_FreeSurface(text_surface);
-    if (!texture) {
-        write_to_file("Error creating texture from surface.");
-        return NULL;
-    }
-
-    SDL_SetTextureScaleMode(texture, SDL_ScaleModeLinear);
-    return texture;
-}
-
-void render_grid_overlay(GameState* game){
-    SDL_SetRenderDrawBlendMode(game->renderer, SDL_BLENDMODE_BLEND);
-
-    SDL_SetRenderDrawColor(game->renderer, GRID_COLOR.r,GRID_COLOR.g,GRID_COLOR.b,GRID_COLOR.a);
-
-    for (int x = GRID_CELL_SIZE; x < WINDOW_WIDTH; x += GRID_CELL_SIZE){
-        SDL_RenderDrawLine(game->renderer, x, 0, x, WINDOW_HEIGHT);
-    }
-
-    for (int y = GRID_CELL_SIZE; y < WINDOW_HEIGHT; y += GRID_CELL_SIZE){
-        SDL_RenderDrawLine(game->renderer, 0, y, WINDOW_WIDTH, y);
-    }
-}

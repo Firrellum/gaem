@@ -15,7 +15,7 @@
 #define FRAME_TARGET_TIME (1000.0 / FPS)
 
 #define MOVE_SPEED 300.0f
-#define PLAYER_SIZE 10
+#define PLAYER_SIZE 12
 
 #define MAX_PARTICLES 100      
 #define PARTICLE_SIZE 6        
