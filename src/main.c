@@ -18,26 +18,29 @@ bool init_game(GameState* game);
 void write_to_file(const char *text);
 void setup(GameState* game);
 void calculate_delta_time(GameState* game);
-void render_game(GameState* game, TTF_Font* font);
-void render_start_screen(GameState* game, TTF_Font* font);
+void render_game(GameState* game);
+void render_gameplay_ui(GameState* game);
+void render_start_screen(GameState* game);
 SDL_Texture* render_text(SDL_Renderer* renderer, const char* text, TTF_Font* font, SDL_Color fg);
 void render_text_at(SDL_Renderer* renderer, SDL_Texture* texture, int x, int y);
 void render_border(GameState* game);
 void update_game(GameState* game);
 void handle_inputs(GameState* game, Player* player);
-void cleanup_and_quit(GameState* game, TTF_Font* font);
+void cleanup_and_quit(GameState* game, TTF_Font* font, TTF_Font* ui_font);
+void render_grid_overlay(GameState* game);
 
 void write_to_file(const char* text){
     fprintf(file,"%s\n", text);
 }
 
-void cleanup_and_quit(GameState* game, TTF_Font* font){
+void cleanup_and_quit(GameState* game, TTF_Font* font, TTF_Font* ui_font){
     write_to_file("Destroying renderer.");
     SDL_DestroyRenderer(game->renderer);
     write_to_file("Destroying window.");
     SDL_DestroyWindow(game->window);
-    write_to_file("Closing ttf.");
+    write_to_file("Closing ttfS.");
     TTF_CloseFont(font);
+    TTF_CloseFont(ui_font);
     TTF_Quit();
     write_to_file("Exiting..0/");
     fclose(file);
@@ -188,14 +191,27 @@ void render_text_at(SDL_Renderer* renderer, SDL_Texture* texture, int x, int y) 
     SDL_RenderCopy(renderer, texture, NULL, &text_rect);
 }
 
-void render_start_screen(GameState* game, TTF_Font* font) {
+void render_gameplay_ui(GameState* game){
+    SDL_Color ui_color = {255,255,255,255};
+
+    SDL_Texture* player_score_texture = render_text(game->renderer, "Score :", game->ui_font, ui_color);
+    SDL_Texture* player_hp_texture = render_text(game->renderer, "HP :", game->ui_font, ui_color);
+
+    render_text_at(game->renderer, player_score_texture, 130, 30); 
+    render_text_at(game->renderer, player_hp_texture, 400, 30); 
+
+    SDL_DestroyTexture(player_score_texture);
+    SDL_DestroyTexture(player_hp_texture);
+}
+
+void render_start_screen(GameState* game) {
     // set colours
     SDL_Color button_color = {255, 255, 255, 255};
     SDL_Color title_color = {0, 255, 255, 255};
 
     // create the textures with the fonts
-    SDL_Texture* game_title_texture = render_text(game->renderer, "F Cubed (f³)", font, title_color);
-    SDL_Texture* button_text_texture = render_text(game->renderer, "ENTER to Start", font, button_color);
+    SDL_Texture* game_title_texture = render_text(game->renderer, "F Cubed (f³)", game->font, title_color);
+    SDL_Texture* button_text_texture = render_text(game->renderer, "ENTER to Start", game->font, button_color);
 
     // render 'button'
     render_text_at(game->renderer, button_text_texture, WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2);
@@ -209,7 +225,7 @@ void render_start_screen(GameState* game, TTF_Font* font) {
 }
 
 void render_border(GameState* game){
-    SDL_SetRenderDrawColor(game->renderer, 0, 255, 255, 75); // color border
+    SDL_SetRenderDrawColor(game->renderer, BORDER_COLOR.r, BORDER_COLOR.g, BORDER_COLOR.b, BORDER_COLOR.a); // color border
 
     // border || SDL defaults to one pixel wide | for loop
     for (int i = 0; i < BORDER_SIZE; i++){
@@ -222,41 +238,48 @@ void render_border(GameState* game){
     
 }
 
-void render_pause_menu(GameState* game, TTF_Font* font) {
+void render_pause_menu(GameState* game) {
+    SDL_SetRenderDrawBlendMode(game->renderer, SDL_BLENDMODE_BLEND);
+
+    SDL_SetRenderDrawColor(game->renderer, MENU_BACKDROP.r, MENU_BACKDROP.g, MENU_BACKDROP.b, MENU_BACKDROP.a);
+    SDL_Rect backdrop = {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
+    SDL_RenderFillRect(game->renderer, &backdrop);
+    SDL_RenderClear(game->renderer);
     // color highlights and main
-    SDL_Color selected_color = {0, 255, 255, 255};  
-    SDL_Color unselected_color = {255, 255, 255, 255};  
+    SDL_Color selected_color = SELECTED_COLOR;  
+    SDL_Color unselected_color = BASE_COLOR;  
 
     int y_offset = WINDOW_HEIGHT / 2 - (game->pause_menu.option_count * 50) / 2;  // menu pos
     // loop for each item
     for (int i = 0; i < game->pause_menu.option_count; i++) {
         SDL_Color color = game->pause_menu.options[i].selected ? selected_color : unselected_color;
-        SDL_Texture* option_texture = render_text(game->renderer, game->pause_menu.options[i].text, font, color);
+        SDL_Texture* option_texture = render_text(game->renderer, game->pause_menu.options[i].text, game->font, color);
         render_text_at(game->renderer, option_texture, WINDOW_WIDTH / 2, y_offset + i * 50);
         SDL_DestroyTexture(option_texture);  // cleaning
     }
 }
 
-void render_game(GameState* game, TTF_Font* font){
+void render_game(GameState* game){
     SDL_SetRenderDrawColor(game->renderer, 0, 0, 0, 255); // Set colot 
     SDL_RenderClear(game->renderer); // clear Screen
     
     if(game->mode == STATE_START_SCREEN){
-        render_start_screen(game, font);
+        render_start_screen(game);
         render_border(game); // render border
     }else if (game->mode == STATE_PLAYING){
         render_border(game); // render border
+        render_gameplay_ui(game);
         render_particles(&game->particles, game->renderer); // pender particles
         render_player_cube(&game->player, game->renderer); // render player
     } else if (game->mode == STATE_PAUSED) {
-        render_border(game);
         render_particles(&game->particles, game->renderer);  // keep particles visible but frozen
         render_player_cube(&game->player, game->renderer);
-        render_pause_menu(game, font);  // overlay the pause menu
+        render_pause_menu(game);  // overlay the pause menu
+        render_border(game);
     }
-    
+    render_grid_overlay(game); // testing|align grid
     SDL_RenderPresent(game->renderer); // present render
-
+   
     // order matters here
 }
 
@@ -286,6 +309,8 @@ void setup(GameState* game){
     
     game->menu_cooldown = 0.0f;
 
+    game->ui_info.options[0] = (UiOptions){"Score: "};
+    game->ui_info.options[0] = (UiOptions){"HP: "};
     write_to_file("Spawn cube and menus.");
 
 }
@@ -310,6 +335,12 @@ bool init_game(GameState* game){
         write_to_file("Error loading font.");
         return false;
     }else{ write_to_file("Font loaded");};
+
+    game->ui_font = TTF_OpenFont("./src/assets/font.ttf", 24);
+    if(!game->ui_font){
+        write_to_file("Error loading ui_font.");
+        return false;
+    }else{ write_to_file("UIFont loaded");};
 
     game->window = SDL_CreateWindow(
         NULL, // window name
@@ -369,11 +400,11 @@ int main(int argc, char *argv[]){
     while(game.running){
         handle_inputs(&game, &game.player); // handle inputs
         update_game(&game); // update game
-        render_game(&game, game.font); // render game
+        render_game(&game); // render game
         
     }
 
-    cleanup_and_quit(&game, game.font);
+    cleanup_and_quit(&game, game.font, game.ui_font);
     return 0;
 }
 
@@ -392,4 +423,18 @@ SDL_Texture* render_text(SDL_Renderer* renderer, const char* text, TTF_Font* fon
 
     SDL_SetTextureScaleMode(texture, SDL_ScaleModeLinear);
     return texture;
+}
+
+void render_grid_overlay(GameState* game){
+    SDL_SetRenderDrawBlendMode(game->renderer, SDL_BLENDMODE_BLEND);
+
+    SDL_SetRenderDrawColor(game->renderer, GRID_COLOR.r,GRID_COLOR.g,GRID_COLOR.b,GRID_COLOR.a);
+
+    for (int x = GRID_CELL_SIZE; x < WINDOW_WIDTH; x += GRID_CELL_SIZE){
+        SDL_RenderDrawLine(game->renderer, x, 0, x, WINDOW_HEIGHT);
+    }
+
+    for (int y = GRID_CELL_SIZE; y < WINDOW_HEIGHT; y += GRID_CELL_SIZE){
+        SDL_RenderDrawLine(game->renderer, 0, y, WINDOW_WIDTH, y);
+    }
 }

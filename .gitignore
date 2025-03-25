@@ -2,3 +2,5 @@
 unused/
 .vscode/
 
+*.o
+direction.txt

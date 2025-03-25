@@ -8,6 +8,7 @@
 
 // player data
 typedef struct {
+    int hp;
     float x, y;           
     int size;
     float speed;
@@ -44,11 +45,20 @@ typedef struct {
     int selected_index;     
 } PauseMenu;
 
+typedef struct {
+    const char* text;
+} UiOptions;
+
+typedef struct{
+    UiOptions options[2];
+} UiInfoScreen;
+
 // game state
 typedef struct GameState {
     SDL_Window* window;
     SDL_Renderer* renderer;
     TTF_Font* font; 
+    TTF_Font* ui_font; 
     bool running;
     double delta_time;
     double last_frame_time;
@@ -58,6 +68,7 @@ typedef struct GameState {
     ParticleSystem particles;
     // Color border_color;
     GameMode mode;
+    UiInfoScreen ui_info;
     PauseMenu pause_menu;
     float menu_cooldown;
     float paused_dx, paused_dy;

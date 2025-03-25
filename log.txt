@@ -2,11 +2,12 @@ Hello Game!
 Initialized SDL | VIDEO
 Initialized SDL_TTF.
 Font loaded
+UIFont loaded
 Created window.
 Created renderer.
 Failed to load F icon.
 Spawn cube and menus.
 Destroying renderer.
 Destroying window.
-Closing ttf.
+Closing ttfS.
 Exiting..0/
