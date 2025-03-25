@@ -10,11 +10,11 @@
 // player data
 typedef struct {
     int hp;
-    float x, y;           
+    float x, y;
     int size;
     float speed;
-    float dx, dy;         
-    bool alive;           
+    float dx, dy;
+    bool alive;
 } Player;
 
 // particle data
@@ -55,18 +55,28 @@ typedef struct{
 } UiInfoScreen;
 
 typedef struct {
-    float x, y;           
-    int size;             
-    bool active;          
+    float x, y;
+    int size;
+    bool active;
 } Collectible;
 
-// Enemy data
 typedef struct {
-    float x, y;           
-    int size;             
-    float speed;          
-    bool active;          
+    float x, y;
+    int size;
+    float speed;
+    bool active;
 } Enemy;
+
+typedef struct {
+    float start_x, start_y; 
+    float end_x, end_y;      
+    float target_x, target_y; 
+    float speed;             
+    int size;                
+    bool active;             
+    bool shrinking;         
+    int collectible_sets;    
+} LineEnemy;
 
 // game state
 typedef struct GameState {
@@ -90,6 +100,7 @@ typedef struct GameState {
     Collectible collectibles[5];
     int collectible_count;
     Enemy enemy;
+    LineEnemy line_enemy;
     bool restart_requested;
 } GameState;
 

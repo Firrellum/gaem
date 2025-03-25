@@ -1,7 +1,7 @@
 COMPILER = gcc
 COMPILERFLAGS = -Wall -std=c99
 LDFLAGS = -mwindows -lmingw32 -lSDL2main -lSDL2 -lSDL2_ttf -lSDL2_image
-SOURCES = ./src/main.c ./src/player.c ./src/renderer.c
+SOURCES = ./src/main.c ./src/player.c ./src/renderer.c ./src/mechanics.c
 EXECUTABLE = Fcubed.exe
 
 build: resource.o

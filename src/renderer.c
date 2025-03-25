@@ -7,6 +7,7 @@
 #include "entities.h"
 #include "player.h"
 #include "renderer.h"
+#include "mechanics.h"
 
 void write_to_file(const char *text);
 void render_game(GameState* game);
@@ -168,6 +169,7 @@ void render_game(GameState* game) {
         render_collectibles(game);
         // printf("Rendering enemy\n");
         render_enemy(game);
+        render_line_enemy(game);
         if (game->game_over) {
             // printf("Rendering game over\n");
             SDL_Texture* game_over_texture = render_text(game->renderer, "Game Over", game->font, SELECTED_COLOR);

@@ -1,9 +1,8 @@
-
-
 #include <math.h>
 #include "player.h"
 #include "constants.h"
 #include "utils.h"
+#include "mechanics.h"
 
 // player 
 // render player cube
@@ -135,8 +134,12 @@ void check_and_respawn_collectibles(GameState* game) {
             active_count++;
         }
     }
-    if (active_count == 0) { 
-        spawn_collectibles(game); 
+    if (active_count == 0) {
+        game->line_enemy.collectible_sets++; // ++ sets collected
+        spawn_collectibles(game);
+        if (game->line_enemy.collectible_sets >= 1 && !game->line_enemy.active) {
+            spawn_line_enemy(game); // spawn here
+        }
     }
 }
 
