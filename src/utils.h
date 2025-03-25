@@ -13,11 +13,6 @@ typedef struct {
 //     Uint8 r, g , b, a; 
 // } ColorAlpha;
 
-#define BASE_COLOR (SDL_Color){225,225,225,255} 
-#define SELECTED_COLOR (SDL_Color){000, 255, 255, 255}
-
-#define MENU_BACKDROP (SDL_Color){20,20,20,128}
-
 #define COLOR_WHITE (Color){255, 255, 255} // white
 #define COLOR_TINT (Color){000, 255, 255} // tint color
 
