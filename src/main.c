@@ -47,6 +47,24 @@ void cleanup_and_quit(GameState* game, TTF_Font* font, TTF_Font* ui_font){
     SDL_Quit();
 }
 
+void reset_game(GameState* game) {
+    game->player.x = WINDOW_WIDTH / 2 - PLAYER_SIZE / 2;
+    game->player.y = WINDOW_HEIGHT / 2 - PLAYER_SIZE / 2;
+    game->player.dx = 0;
+    game->player.dy = 0;
+    game->player.hp = 100;
+    game->player.alive = true;
+
+    game->score = 0;
+    game->game_over = false;
+
+    game->particles.count = 0;
+    game->particles.spawn_timer = 0;
+
+    spawn_collectibles(game);
+    spawn_enemy(game);
+}
+
 void handle_inputs(GameState* game, Player* player) {
     SDL_Event event;
 
@@ -75,7 +93,15 @@ void handle_inputs(GameState* game, Player* player) {
                 (game->mode == STATE_PAUSED && game->pause_menu.selected_index == 3 && event.key.keysym.sym == SDLK_RETURN)) {
                 game->running = false;
             }
+            if (game->game_over && event.key.keysym.sym == SDLK_RETURN) {
+                game->restart_requested = true;
+            }
         }
+    }
+
+    if (game->restart_requested) {
+        reset_game(game);
+        game->restart_requested = false;
     }
 
     if (game->mode == STATE_PLAYING) {
@@ -145,6 +171,7 @@ void handle_inputs(GameState* game, Player* player) {
             }
             game->menu_cooldown = MENU_DELAY_LOCAL;
         }
+
     }
 }
 
@@ -196,7 +223,7 @@ void setup(GameState* game){
     game->player.hp = 100;
     spawn_collectibles(game);
     spawn_enemy(game);
-   
+    game->restart_requested = false;
 
     game->pause_menu.options[0] = (MenuOption){"Resume", false};
     game->pause_menu.options[1] = (MenuOption){"Settings", false};

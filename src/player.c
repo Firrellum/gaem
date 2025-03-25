@@ -128,6 +128,18 @@ void spawn_collectibles(GameState* game) {
     }
 }
 
+void check_and_respawn_collectibles(GameState* game) {
+    int active_count = 0;
+    for (int i = 0; i < game->collectible_count; i++) {
+        if (game->collectibles[i].active) {
+            active_count++;
+        }
+    }
+    if (active_count == 0) { 
+        spawn_collectibles(game); 
+    }
+}
+
 void update_collectibles(GameState* game) {
     for (int i = 0; i < game->collectible_count; i++) {
         if (!game->collectibles[i].active) continue;
@@ -137,10 +149,11 @@ void update_collectibles(GameState* game) {
             game->player.x + game->player.size > game->collectibles[i].x &&
             game->player.y < game->collectibles[i].y + game->collectibles[i].size &&
             game->player.y + game->player.size > game->collectibles[i].y) {
-            game->collectibles[i].active = false; // Collect it
-            game->score += 10;                    // Add 10 points
+            game->collectibles[i].active = false; 
+            game->score += 10;                    
         }
     }
+    check_and_respawn_collectibles(game);
 }
 
 // void render_collectibles(GameState* game){

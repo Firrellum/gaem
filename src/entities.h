@@ -90,6 +90,7 @@ typedef struct GameState {
     Collectible collectibles[5];
     int collectible_count;
     Enemy enemy;
+    bool restart_requested;
 } GameState;
 
 

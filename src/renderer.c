@@ -69,26 +69,26 @@ void render_text_at(SDL_Renderer* renderer, SDL_Texture* texture, int x, int y, 
 void render_gameplay_ui(GameState* game) {
     SDL_Color ui_color = {255, 255, 255, 255};
     char score_text[32];
-    char hp_text[32];
+    // char hp_text[32];
     // printf("Formatting score text\n");
     sprintf(score_text, "Score: %d", game->score);
     // printf("Formatting HP text\n");
-    sprintf(hp_text, "HP: %d", game->player.hp);
+    // sprintf(hp_text, "HP: %d", game->player.hp);
 
     // printf("Creating score texture\n");
     SDL_Texture* player_score_texture = render_text(game->renderer, score_text, game->ui_font, ui_color);
     // printf("Creating HP texture\n");
-    SDL_Texture* player_hp_texture = render_text(game->renderer, hp_text, game->ui_font, ui_color);
+    // SDL_Texture* player_hp_texture = render_text(game->renderer, hp_text, game->ui_font, ui_color);
 
     // printf("Rendering score text\n");
-    render_text_at(game->renderer, player_score_texture, 48, WINDOW_HEIGHT - 24, false);
+    render_text_at(game->renderer, player_score_texture, 12, 48, false);
     // printf("Rendering HP text\n");
-    render_text_at(game->renderer, player_hp_texture, 48, WINDOW_HEIGHT - 48, false);
+    // render_text_at(game->renderer, player_hp_texture, 48, WINDOW_HEIGHT - 48, false);
 
     // printf("Destroying score texture\n");
     SDL_DestroyTexture(player_score_texture);
     // printf("Destroying HP texture\n");
-    SDL_DestroyTexture(player_hp_texture);
+    // SDL_DestroyTexture(player_hp_texture);
 }
 
 void render_start_screen(GameState* game) {
@@ -173,6 +173,9 @@ void render_game(GameState* game) {
             SDL_Texture* game_over_texture = render_text(game->renderer, "Game Over", game->font, SELECTED_COLOR);
             render_text_at(game->renderer, game_over_texture, WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2, true);
             SDL_DestroyTexture(game_over_texture);
+            SDL_Texture* restart_texture = render_text(game->renderer, "Press R to Restart", game->ui_font, BASE_COLOR);
+            render_text_at(game->renderer, restart_texture, WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2 + 50, true);
+            SDL_DestroyTexture(restart_texture);
         }
     } else if (game->mode == STATE_PAUSED) {
         // printf("Rendering paused state\n");
