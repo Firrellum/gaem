@@ -64,7 +64,7 @@ void reset_game(GameState* game) {
 
     spawn_collectibles(game);
     spawn_enemy(game);
-    init_line_enemy(game);
+    init_line_enemies(game);
 }
 
 void handle_inputs(GameState* game, Player* player) {
@@ -195,7 +195,7 @@ void update_game(GameState* game){
         update_collectibles(game);
         // printf("Updating enemy\n");
         update_enemy(game);
-        update_line_enemy(game);
+        update_line_enemies(game);
         if (game->particles.spawn_timer >= SPAWN_RATE) {
             game->particles.spawn_timer = 0;
             if (game->player.dx != 0 || game->player.dy != 0) {
@@ -227,7 +227,7 @@ void setup(GameState* game){
     spawn_collectibles(game);
     spawn_enemy(game);
     game->restart_requested = false;
-    init_line_enemy(game);
+    init_line_enemies(game);
 
     game->pause_menu.options[0] = (MenuOption){"Resume", false};
     game->pause_menu.options[1] = (MenuOption){"Settings", false};

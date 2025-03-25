@@ -1,4 +1,5 @@
 #include <math.h>
+#include <stdio.h>
 #include "player.h"
 #include "constants.h"
 #include "utils.h"
@@ -134,12 +135,13 @@ void check_and_respawn_collectibles(GameState* game) {
             active_count++;
         }
     }
+    printf("Active collectibles: %d\n", active_count);
     if (active_count == 0) {
-        game->line_enemy.collectible_sets++; // ++ sets collected
+        printf("All collected, sets: %d\n", game->total_collectible_sets + 1);
+        game->total_collectible_sets++; 
         spawn_collectibles(game);
-        if (game->line_enemy.collectible_sets >= 1 && !game->line_enemy.active) {
-            spawn_line_enemy(game); // spawn here
-        }
+        printf("Spawning line enemy for set %d\n", game->total_collectible_sets);
+        spawn_line_enemy(game); 
     }
 }
 

@@ -1,25 +1,30 @@
-// [mechanics.c]
 #include <math.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include "mechanics.h"
 #include "constants.h"
 #include "utils.h"
 
-void init_line_enemy(GameState* game) {
-    LineEnemy* line = &game->line_enemy;
-    line->size = PLAYER_SIZE;
-    line->speed = 200.0f; // Adjust as needed
-    line->active = false; // Starts inactive until first set collected
-    line->shrinking = false;
-    line->collectible_sets = 0;
+void init_line_enemies(GameState* game) {
+    game->line_enemy_count = 0;
+    game->total_collectible_sets = 0;
+    for (int i = 0; i < 10; i++) { 
+        game->line_enemies[i].size = PLAYER_SIZE;
+        game->line_enemies[i].speed = 200.0f;
+        game->line_enemies[i].active = false;
+        game->line_enemies[i].shrinking = false;
+        game->line_enemies[i].collectible_sets = 0;
+    }
 }
 
 void spawn_line_enemy(GameState* game) {
-    LineEnemy* line = &game->line_enemy;
+    if (game->line_enemy_count >= 10) return; // overflow
+
+    LineEnemy* line = &game->line_enemies[game->line_enemy_count];
     line->active = true;
     line->shrinking = false;
+    line->collectible_sets = game->total_collectible_sets;
 
-    // Randomly pick a side (0: left, 1: right, 2: top, 3: bottom)
     int side = rand() % 4;
     switch (side) {
         case 0: // Left
@@ -49,75 +54,81 @@ void spawn_line_enemy(GameState* game) {
     }
     line->end_x = line->start_x;
     line->end_y = line->start_y;
+    game->line_enemy_count++;
+    printf("Line enemy spawned, total active: %d\n", game->line_enemy_count);
 }
 
-void update_line_enemy(GameState* game) {
-    LineEnemy* line = &game->line_enemy;
-    if (!line->active) return;
+void update_line_enemies(GameState* game) {
+    for (int i = 0; i < game->line_enemy_count; i++) {
+        LineEnemy* line = &game->line_enemies[i];
+        if (!line->active) continue;
 
-    if (!line->shrinking) {
-        // Move end point toward target
-        float dx = line->target_x - line->end_x;
-        float dy = line->target_y - line->end_y;
-        float distance = sqrt(dx * dx + dy * dy);
-        if (distance > 0) {
-            dx /= distance; // Normalize
-            dy /= distance;
-            float move = line->speed * game->delta_time;
-            line->end_x += dx * move;
-            line->end_y += dy * move;
+        if (!line->shrinking) {
+            float dx = line->target_x - line->end_x;
+            float dy = line->target_y - line->end_y;
+            float distance = sqrt(dx * dx + dy * dy);
+            if (distance > 0) {
+                dx /= distance;
+                dy /= distance;
+                float move = line->speed * game->delta_time;
+                line->end_x += dx * move;
+                line->end_y += dy * move;
 
-            // Check if reached target
-            if (distance <= move) {
-                line->end_x = line->target_x;
-                line->end_y = line->target_y;
-                line->shrinking = true;
+                if (distance <= move) {
+                    line->end_x = line->target_x;
+                    line->end_y = line->target_y;
+                    line->shrinking = true;
+                }
+            }
+        } else {
+            float dx = line->end_x - line->start_x;
+            float dy = line->end_y - line->start_y;
+            float length = sqrt(dx * dx + dy * dy);
+            if (length > 0) {
+                dx /= length;
+                dy /= length;
+                float shrink = line->speed * game->delta_time;
+                line->start_x += dx * shrink;
+                line->start_y += dy * shrink;
+
+                if (length <= shrink) {
+                    line->active = false;
+                    for (int j = i; j < game->line_enemy_count - 1; j++) {
+                        game->line_enemies[j] = game->line_enemies[j + 1];
+                    }
+                    game->line_enemy_count--;
+                    i--; 
+                    spawn_line_enemy(game); 
+                }
             }
         }
-    } else {
-        // Shrink from start toward end
-        float dx = line->end_x - line->start_x;
-        float dy = line->end_y - line->start_y;
-        float length = sqrt(dx * dx + dy * dy);
-        if (length > 0) {
-            dx /= length;
-            dy /= length;
-            float shrink = line->speed * game->delta_time;
-            line->start_x += dx * shrink;
-            line->start_y += dy * shrink;
 
-            // Check if fully shrunk
-            if (length <= shrink) {
-                line->active = false; // Deactivate until respawn
-                spawn_line_enemy(game); // Respawn from new position
-            }
+        SDL_Rect line_rect = {(int)line->start_x, (int)line->start_y, 
+                              (int)(line->end_x - line->start_x), (int)(line->end_y - line->start_y)};
+        if (line_rect.w < 0) {
+            line_rect.x += line_rect.w;
+            line_rect.w = -line_rect.w;
         }
-    }
-
-    // Collision with player
-    SDL_Rect line_rect = {(int)line->start_x, (int)line->start_y, 
-                          (int)(line->end_x - line->start_x), (int)(line->end_y - line->start_y)};
-    if (line_rect.w < 0) {
-        line_rect.x += line_rect.w;
-        line_rect.w = -line_rect.w;
-    }
-    if (line_rect.h < 0) {
-        line_rect.y += line_rect.h;
-        line_rect.h = -line_rect.h;
-    }
-    if (game->player.x < line_rect.x + line_rect.w &&
-        game->player.x + game->player.size > line_rect.x &&
-        game->player.y < line_rect.y + line_rect.h &&
-        game->player.y + game->player.size > line_rect.y) {
-        game->game_over = true;
+        if (line_rect.h < 0) {
+            line_rect.y += line_rect.h;
+            line_rect.h = -line_rect.h;
+        }
+        if (game->player.x < line_rect.x + line_rect.w &&
+            game->player.x + game->player.size > line_rect.x &&
+            game->player.y < line_rect.y + line_rect.h &&
+            game->player.y + game->player.size > line_rect.y) {
+            game->game_over = true;
+        }
     }
 }
 
-void render_line_enemy(GameState* game) {
-    LineEnemy* line = &game->line_enemy;
-    if (!line->active) return;
+void render_line_enemies(GameState* game) {
+    for (int i = 0; i < game->line_enemy_count; i++) {
+        LineEnemy* line = &game->line_enemies[i];
+        if (!line->active) continue;
 
-    SDL_SetRenderDrawColor(game->renderer, 0, 255, 0, 255); // Green for visibility
-    SDL_RenderDrawLine(game->renderer, (int)line->start_x, (int)line->start_y, 
-                       (int)line->end_x, (int)line->end_y);
+        SDL_SetRenderDrawColor(game->renderer, 224, 16, 186, 255);
+        SDL_RenderDrawLine(game->renderer, (int)line->start_x, (int)line->start_y, 
+                           (int)line->end_x, (int)line->end_y);
+    }
 }

@@ -100,7 +100,9 @@ typedef struct GameState {
     Collectible collectibles[5];
     int collectible_count;
     Enemy enemy;
-    LineEnemy line_enemy;
+    LineEnemy line_enemies[10];
+    int line_enemy_count;       
+    int total_collectible_sets;
     bool restart_requested;
 } GameState;
 
