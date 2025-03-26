@@ -217,7 +217,9 @@ void update_enemy(GameState* game) {
         game->player.x + game->player.size > game->enemy.x &&
         game->player.y < game->enemy.y + game->enemy.size &&
         game->player.y + game->player.size > game->enemy.y) {
-        game->player.hp -= 20; 
+        // game->player.hp -= 20; 
+        float damage_per_second = 20.0f;
+        game->player.hp -= damage_per_second * game->delta_time; 
         if (game->player.hp <= 0) {
             game->player.hp = 0;
             game->game_over = true; 
@@ -226,6 +228,8 @@ void update_enemy(GameState* game) {
             } 
         }
     }
+
+
 }
 
 void render_enemy(GameState* game) {

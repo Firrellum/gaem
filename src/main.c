@@ -98,12 +98,16 @@ void handle_inputs(GameState* game, Player* player) {
                     printf("Failed to play start sound! Mix_Error: %s\n", Mix_GetError());
                 }  
             }
+           
             // quit on escape from start screen or desktop option
             if ((game->mode == STATE_START_SCREEN && event.key.keysym.sym == SDLK_ESCAPE) ||
                 (game->mode == STATE_PAUSED && game->pause_menu.selected_index == 3 && event.key.keysym.sym == SDLK_RETURN)) {
                 game->running = false;
             }
-            if (game->game_over && event.key.keysym.sym == SDLK_RETURN) {
+            if (game->game_over && event.key.keysym.sym == SDLK_r) {
+                game->restart_requested = true;
+            }else if (game->game_over && event.key.keysym.sym == SDLK_ESCAPE){
+                game->mode = STATE_START_SCREEN;
                 game->restart_requested = true;
             }
         }
@@ -276,7 +280,7 @@ bool init_game(GameState* game){
         return false;
     }else{ write_to_file("Font loaded");};
 
-    game->ui_font = TTF_OpenFont("./src/assets/font.ttf", 24);
+    game->ui_font = TTF_OpenFont("./src/assets/font.ttf", 72);
     if(!game->ui_font){
         write_to_file("Error loading ui_font.");
         return false;

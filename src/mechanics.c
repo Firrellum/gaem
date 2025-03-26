@@ -175,6 +175,7 @@ void update_line_enemies(GameState* game) {
             game->player.y < line_rect.y + line_rect.h &&
             game->player.y + game->player.size > line_rect.y) {
             printf("Player hit line %d - Game Over\n", i);
+            game->player.hp = 0;
             game->game_over = true;
             if (Mix_PlayChannel(-1, game->dead_sound, 0) == -1) {
                 printf("Failed to play dead sound! Mix_Error: %s\n", Mix_GetError());
