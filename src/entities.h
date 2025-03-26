@@ -107,9 +107,8 @@ typedef struct GameState {
     Mix_Chunk* pick_up_sound;
     Mix_Chunk* dead_sound;
     Mix_Chunk* start_sound;
+    Mix_Music* main_sound_loop;
     bool restart_requested;
 } GameState;
-
-
 
 #endif 

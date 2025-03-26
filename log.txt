@@ -6,6 +6,7 @@ UIFont loaded
 Loaded pickup noise.
 Loaded dead noise.
 Loaded start pickup noise.
+Loaded start main_sound_loop noise.
 Created window.
 Created renderer.
 Failed to load F icon.

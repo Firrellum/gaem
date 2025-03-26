@@ -251,6 +251,8 @@ void setup(GameState* game){
     game->ui_info.options[0] = (UiOptions){"HP: "};
     write_to_file("Spawn cube and menus.");
 
+    
+
 }
 
 bool init_game(GameState* game){
@@ -294,16 +296,28 @@ bool init_game(GameState* game){
     }else{write_to_file("Loaded pickup noise.");};
 
     game->dead_sound = Mix_LoadWAV("./src/assets/dead_sound.wav");
-    if (game->pick_up_sound == NULL) {
+    if (game->dead_sound == NULL) {
         write_to_file("Failed to load dead_sound.wav! Mix_Error");
         return false;
     }else{write_to_file("Loaded dead noise.");};
 
     game->start_sound = Mix_LoadWAV("./src/assets/start_sound.wav");
-    if (game->pick_up_sound == NULL) {
+    if (game->start_sound == NULL) {
         write_to_file("Failed to load start_sound.wav! Mix_Error");
         return false;
     }else{write_to_file("Loaded start pickup noise.");};
+
+    game->main_sound_loop = Mix_LoadMUS("./src/assets/main_sound_loop.mp3");
+    if (game->main_sound_loop == NULL) {
+        write_to_file("Failed to load main_sound_loop.mp3! Mix_Error");
+        return false;
+    }else{write_to_file("Loaded start main_sound_loop noise.");};
+
+    Mix_VolumeMusic(MIX_MAX_VOLUME / 8);
+    if (Mix_PlayMusic(game->main_sound_loop, -1) == -1) {  // -1 means loop 
+        write_to_file("Failed to play main_sound_loop! Mix_Error");
+        return false;
+    } 
 
     game->window = SDL_CreateWindow(
         NULL, // window name
