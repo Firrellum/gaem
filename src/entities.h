@@ -6,6 +6,7 @@
 #include <SDL2/SDL.h>
 #include "constants.h"
 #include "utils.h"
+#include <SDL2/SDL_mixer.h>
 
 // player data
 typedef struct {
@@ -103,6 +104,9 @@ typedef struct GameState {
     LineEnemy line_enemies[10];
     int line_enemy_count;       
     int total_collectible_sets;
+    Mix_Chunk* pick_up_sound;
+    Mix_Chunk* dead_sound;
+    Mix_Chunk* start_sound;
     bool restart_requested;
 } GameState;
 

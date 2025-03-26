@@ -135,12 +135,12 @@ void check_and_respawn_collectibles(GameState* game) {
             active_count++;
         }
     }
-    printf("Active collectibles: %d\n", active_count);
+    // printf("Active collectibles: %d\n", active_count);
     if (active_count == 0) {
-        printf("All collected, sets: %d\n", game->total_collectible_sets + 1);
+        // printf("All collected, sets: %d\n", game->total_collectible_sets + 1);
         game->total_collectible_sets++; 
         spawn_collectibles(game);
-        printf("Spawning line enemy for set %d\n", game->total_collectible_sets);
+        // printf("Spawning line enemy for set %d\n", game->total_collectible_sets);
         spawn_line_enemy(game); 
     }
 }
@@ -155,7 +155,10 @@ void update_collectibles(GameState* game) {
             game->player.y < game->collectibles[i].y + game->collectibles[i].size &&
             game->player.y + game->player.size > game->collectibles[i].y) {
             game->collectibles[i].active = false; 
-            game->score += 10;                    
+            game->score += 10;          
+            if (Mix_PlayChannel(-1, game->pick_up_sound, 0) == -1) {
+                printf("Failed to play pick_up sound! Mix_Error: %s\n", Mix_GetError());
+            }          
         }
     }
     check_and_respawn_collectibles(game);
@@ -194,7 +197,6 @@ void spawn_enemy(GameState* game) {
 void update_enemy(GameState* game) {
     if (!game->enemy.active) return;
 
-    // Direction to player
     float dx = game->player.x - game->enemy.x;
     float dy = game->player.y - game->enemy.y;
     float distance = sqrt(dx * dx + dy * dy);
@@ -203,30 +205,29 @@ void update_enemy(GameState* game) {
         dy /= distance;
     }
 
-    // Move enemy
     game->enemy.x += dx * game->enemy.speed * game->delta_time;
     game->enemy.y += dy * game->enemy.speed * game->delta_time;
 
-    // Keep within bounds
     if (game->enemy.x < BORDER_SIZE) game->enemy.x = BORDER_SIZE;
     if (game->enemy.x > WINDOW_WIDTH - game->enemy.size - BORDER_SIZE) game->enemy.x = WINDOW_WIDTH - game->enemy.size - BORDER_SIZE;
     if (game->enemy.y < BORDER_SIZE) game->enemy.y = BORDER_SIZE;
     if (game->enemy.y > WINDOW_HEIGHT - game->enemy.size - BORDER_SIZE) game->enemy.y = WINDOW_HEIGHT - game->enemy.size - BORDER_SIZE;
 
-    // Collision with player
     if (game->player.x < game->enemy.x + game->enemy.size &&
         game->player.x + game->player.size > game->enemy.x &&
         game->player.y < game->enemy.y + game->enemy.size &&
         game->player.y + game->player.size > game->enemy.y) {
-        game->player.hp -= 20; // Reduce HP by 20
+        game->player.hp -= 20; 
         if (game->player.hp <= 0) {
             game->player.hp = 0;
-            game->game_over = true; // End game if HP hits 0
+            game->game_over = true; 
+            if (Mix_PlayChannel(-1, game->dead_sound, 0) == -1) {
+                printf("Failed to play dead sound! Mix_Error: %s\n", Mix_GetError());
+            } 
         }
     }
 }
 
-// Render enemy
 void render_enemy(GameState* game) {
     if (game->enemy.active) {
         SDL_SetRenderDrawColor(game->renderer, 255, 0, 0, 255); // Red color

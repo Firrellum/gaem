@@ -1,6 +1,6 @@
 COMPILER = gcc
 COMPILERFLAGS = -Wall -std=c99
-LDFLAGS = -mwindows -lmingw32 -lSDL2main -lSDL2 -lSDL2_ttf -lSDL2_image
+LDFLAGS = -mwindows -lmingw32 -lSDL2main -lSDL2 -lSDL2_ttf -lSDL2_image -lSDL2_mixer
 SOURCES = ./src/main.c ./src/player.c ./src/renderer.c ./src/mechanics.c
 EXECUTABLE = Fcubed.exe
 

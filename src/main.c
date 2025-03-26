@@ -1,6 +1,7 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
 #include <SDL2/SDL_image.h>
+#include <SDL2/SDL_mixer.h>
 #include <stdio.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -43,6 +44,10 @@ void cleanup_and_quit(GameState* game, TTF_Font* font, TTF_Font* ui_font){
     TTF_CloseFont(font);
     TTF_CloseFont(ui_font);
     TTF_Quit();
+    Mix_FreeChunk(game->pick_up_sound);
+    Mix_CloseAudio(); 
+    Mix_Quit();
+    IMG_Quit();
     write_to_file("Exiting..0/");
     fclose(file);
     SDL_Quit();
@@ -89,6 +94,9 @@ void handle_inputs(GameState* game, Player* player) {
             if (game->mode == STATE_START_SCREEN && event.key.keysym.sym == SDLK_RETURN) {
                 // printf("Entering STATE_PLAYING\n");
                 game->mode = STATE_PLAYING;  
+                if (Mix_PlayChannel(-1, game->start_sound, 0) == -1) {
+                    printf("Failed to play start sound! Mix_Error: %s\n", Mix_GetError());
+                }  
             }
             // quit on escape from start screen or desktop option
             if ((game->mode == STATE_START_SCREEN && event.key.keysym.sym == SDLK_ESCAPE) ||
@@ -250,7 +258,7 @@ bool init_game(GameState* game){
     file = fopen("log.txt", "w");
     write_to_file("Hello Game!");
 
-    if (SDL_Init(SDL_INIT_VIDEO) < 0){
+    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) < 0){
         write_to_file("Error initializing SDL.");
         return false;
     } else { write_to_file("Initialized SDL | VIDEO");};
@@ -271,6 +279,31 @@ bool init_game(GameState* game){
         write_to_file("Error loading ui_font.");
         return false;
     }else{ write_to_file("UIFont loaded");};
+    
+    printf("Initializing SDL_mixer...\n");
+    if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0) {
+        printf("SDL_mixer could not initialize! Mix_Error: %s\n", Mix_GetError());
+        return 1;
+    }
+    printf("SDL_mixer initialized successfully\n");
+
+    game->pick_up_sound = Mix_LoadWAV("./src/assets/pick_up.wav");
+    if (game->pick_up_sound == NULL) {
+        write_to_file("Failed to load pick_up.wav! Mix_Error");
+        return false;
+    }else{write_to_file("Loaded pickup noise.");};
+
+    game->dead_sound = Mix_LoadWAV("./src/assets/dead_sound.wav");
+    if (game->pick_up_sound == NULL) {
+        write_to_file("Failed to load dead_sound.wav! Mix_Error");
+        return false;
+    }else{write_to_file("Loaded dead noise.");};
+
+    game->start_sound = Mix_LoadWAV("./src/assets/start_sound.wav");
+    if (game->pick_up_sound == NULL) {
+        write_to_file("Failed to load start_sound.wav! Mix_Error");
+        return false;
+    }else{write_to_file("Loaded start pickup noise.");};
 
     game->window = SDL_CreateWindow(
         NULL, // window name

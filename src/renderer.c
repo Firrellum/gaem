@@ -82,7 +82,7 @@ void render_gameplay_ui(GameState* game) {
     // SDL_Texture* player_hp_texture = render_text(game->renderer, hp_text, game->ui_font, ui_color);
 
     // printf("Rendering score text\n");
-    render_text_at(game->renderer, player_score_texture, 12, 48, false);
+    render_text_at(game->renderer, player_score_texture, 12, 12, false);
     // printf("Rendering HP text\n");
     // render_text_at(game->renderer, player_hp_texture, 48, WINDOW_HEIGHT - 48, false);
 

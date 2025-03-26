@@ -3,6 +3,9 @@ Initialized SDL | VIDEO
 Initialized SDL_TTF.
 Font loaded
 UIFont loaded
+Loaded pickup noise.
+Loaded dead noise.
+Loaded start pickup noise.
 Created window.
 Created renderer.
 Failed to load F icon.
