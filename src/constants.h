@@ -1,7 +1,7 @@
 #ifndef CONSTANTS_H
 #define CONSTANTS_H
 
-#define GAME_VERSION "v0.1"
+#define GAME_VERSION "v0.9"
 
 #define WINDOW_WIDTH 1280
 #define WINDOW_HEIGHT 720

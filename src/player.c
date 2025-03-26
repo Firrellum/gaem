@@ -164,17 +164,6 @@ void update_collectibles(GameState* game) {
     check_and_respawn_collectibles(game);
 }
 
-// void render_collectibles(GameState* game){
-//     SDL_SetRenderDrawColor(game->renderer, 255, 255, 0, 255); 
-//     for (int i = 0; game->collectible_count; i++){
-//         if (game->collectibles[i].active){
-//             SDL_Rect collectible_rect = {(int)game->collectibles[1].x, (int)game->collectibles[i].y, 
-//                                             game->collectibles[i].size, game->collectibles[i].size};
-//             SDL_RenderFillRect(game->renderer, &collectible_rect);
-//         }
-//     }
-// } // first segmentation bugg found kek
-
 void render_collectibles(GameState* game) {
     SDL_SetRenderDrawColor(game->renderer, 255, 215, 0, 255); // gold 
     for (int i = 0; i < game->collectible_count; i++) {
