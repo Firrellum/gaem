@@ -4,8 +4,8 @@
 
 This is a simple game side project built using SDL2 in C, designed as a learning exercise alongside the CS50 course. The game initializes an SDL2 window and renderer, manages multiple game states (start screen, playing, paused), and handles player input with a focus on creating a reusable game template. It features a movable player cube with a particle trail, a pause menu with navigation, and momentum preservation. The project is structured into multiple source files for maintainability and includes basic logging for debugging.
 
-## Release
-[v.90](https://github.com/Firrellum/gaem/releases/tag/v.9.0)
+## Release - V0.9.0
+[Release - Latest](https://github.com/Firrellum/gaem/releases/tag/v.9.0)
 
 ## Gameplay
 - Avoid red cube and purple lines, collect pickups.
