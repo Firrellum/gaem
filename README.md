@@ -7,6 +7,8 @@ This is a simple game side project built using SDL2 in C, designed as a learning
 ## Gameplay
 - Avoid red cube and purple lines, collect pickups.
 
+![Interface](https://i.imgur.com/1ftUDKr.gif) 
+
 ## Controls
 
 - **Start Screen**:
@@ -45,18 +47,10 @@ This is a simple game side project built using SDL2 in C, designed as a learning
 - Player movement speed: 300 units/second.
 - Particle system: Up to 100 particles with a 0.8-second lifetime and trail effect.
 
-## Future Improvements
-
-- **Scoring System**: Track distance moved or time survived (CS50 Week 3: Algorithms practice).
-- **Settings Menu**: Expand the "Settings" option with toggles (e.g., particle effects, sound).
-- **Enemy AI**: Add moving obstacles or enemies with basic pathfinding (CS50 Week 5: Data Structures).
-- **UI Polish**: Enhance with fade effects, sound cues, or a semi-transparent pause menu background using SDL_ttf.
-- **Dynamic Particles**: Replace fixed array with a linked list (CS50 Week 5 prep).
-
 ## Build Prerequisites
 
 - SDL2 development libraries installed (`libsdl2-dev` on Ubuntu, or equivalent)
-- SDL2_ttf development libraries installed (`libsdl2-ttf-dev` on Ubuntu)
+- SDL2_ttf development libraries installed (`libsdl2-ttf-dev` on linux)
 - A compiler that supports C (GCC recommended)
 - Make (for using the provided Makefile)
 
@@ -85,3 +79,11 @@ To remove the built game binary:
 ```sh
 make clean
 ```
+
+## Future Improvements
+
+- **Scoring System**: Track distance moved or time survived (CS50 Week 3: Algorithms practice).
+- **Settings Menu**: Expand the "Settings" option with toggles (e.g., particle effects, sound).
+- **Enemy AI**: Add moving obstacles or enemies with basic pathfinding (CS50 Week 5: Data Structures).
+- **UI Polish**: Enhance with fade effects, sound cues, or a semi-transparent pause menu background using SDL_ttf.
+- **Dynamic Particles**: Replace fixed array with a linked list (CS50 Week 5 prep).
