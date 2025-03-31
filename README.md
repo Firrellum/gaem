@@ -51,7 +51,7 @@ This is a simple game side project built using SDL2 in C, designed as a learning
 - Player movement speed: 300 units/second.
 - Particle system: Up to 100 particles with a 0.8-second lifetime and trail effect.
 
-## Build Prerequisites
+## Build Pre requisites
 
 - [SDL2](https://github.com/libsdl-org/SDL/releases/tag/release-2.32.2) development libraries  
 - [SDL2_ttf](https://github.com/libsdl-org/SDL_ttf/releases/tag/release-2.24.0) development libraries  
@@ -80,7 +80,7 @@ This is a simple game side project built using SDL2 in C, designed as a learning
 
 ## Building the Game
 
-To build the game, ensure SDL2 and SDL2_ttf are installed, then run these from the working dir:
+To build the game, ensure you have the prerequisite libs, then run these from the working dir:
 
 ```sh
 make build
