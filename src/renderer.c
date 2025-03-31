@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
+#include <time.h>
 #include "constants.h"
 #include "utils.h"
 #include "entities.h"
@@ -68,32 +69,48 @@ void render_text_at(SDL_Renderer* renderer, SDL_Texture* texture, int x, int y, 
 }
 
 void render_gameplay_ui(GameState* game) {
+    Uint32 current_time = SDL_GetTicks();
+    // int current_score = game->score;
+    // int current_hp = game->player.hp;
+    
     SDL_Color ui_score_color = {0, 122, 122, 200};
     SDL_Color ui_hp_color;
+    
     if(game->player.hp <= 30){
         ui_hp_color = (SDL_Color){126, 33, 2, 200}; 
     }else{ ui_hp_color = (SDL_Color){76, 126, 12, 200};};
     
     char score_text[32];
     char hp_text[32];
-    // printf("Formatting score text\n");
+
+    if(game->score != game->last_score){
+        game->player.last_score_update_time = current_time;
+        game->last_score = game->score;
+    }
+    
+    if (current_time - game->player.last_score_update_time < 300){
+        ui_score_color = (SDL_Color){255, 215, 0, 200};
+    }
+
+    if(game->player.hp != game->player.last_hp){
+        game->player.last_hp_update_time = current_time;
+        game->player.last_hp = game->player.hp;
+    }
+
+    if(current_time - game->player.last_hp_update_time < 300){
+        ui_hp_color = (SDL_Color){126, 33, 2, 200};
+    }
+
     sprintf(score_text, "%d", game->score);
-    // printf("Formatting HP text\n");
     sprintf(hp_text, "%d", game->player.hp);
 
-    // printf("Creating score texture\n");
     SDL_Texture* player_score_texture = render_text(game->renderer, score_text, game->ui_font, ui_score_color);
-    // printf("Creating HP texture\n");
     SDL_Texture* player_hp_texture = render_text(game->renderer, hp_text, game->ui_font, ui_hp_color);
 
-    // printf("Rendering score text\n");
     render_text_at(game->renderer, player_score_texture, 12, 6, false);
-    // printf("Rendering HP text\n");
     render_text_at(game->renderer, player_hp_texture, WINDOW_WIDTH - 130, 6, false);
-
-    // printf("Destroying score texture\n");
+    
     SDL_DestroyTexture(player_score_texture);
-    // printf("Destroying HP texture\n");
     SDL_DestroyTexture(player_hp_texture);
 }
 

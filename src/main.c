@@ -56,11 +56,13 @@ void cleanup_and_quit(GameState* game, TTF_Font* font, TTF_Font* ui_font){
 }
 
 void reset_game(GameState* game) {
+    spawn_enemy(game);
     game->player.x = WINDOW_WIDTH / 2 - PLAYER_SIZE / 2;
     game->player.y = WINDOW_HEIGHT / 2 - PLAYER_SIZE / 2;
     game->player.dx = 0;
     game->player.dy = 0;
     game->player.hp = 100;
+    game->isCollided = false;
     game->player.alive = true;
 
     game->score = 0;
@@ -231,7 +233,8 @@ void update_game(GameState* game){
         if (game->particles.spawn_timer >= SPAWN_RATE) {
             game->particles.spawn_timer = 0;
             if (game->player.dx != 0 || game->player.dy != 0) {
-                spawn_particle(&game->particles, &game->player);
+                // spawn_particle(&game->particles, &game->player);
+                spawn_particle(game, &game->particles, &game->player);
             }
         }
 
@@ -253,8 +256,12 @@ void setup(GameState* game){
     game->player.dx = 0;
     game->player.dy = 0;
     game->player.alive = true;
+    game->isCollided = false;
     game->player.speed = MOVE_SPEED;
     game->player.hp = 100;
+    game->player.last_hp = 100;
+    game->player.last_collide_update_time = 1;
+    game->last_score = 0;
     spawn_collectibles(game);
     spawn_enemy(game);
     game->restart_requested = false;
@@ -340,7 +347,14 @@ bool init_game(GameState* game){
     if (game->start_sound == NULL) {
         write_to_file("Failed to load start_sound.wav! Mix_Error");
         return false;
-    }else{write_to_file("Loaded start pickup noise.");};
+    }else{write_to_file("Loaded start noise.");};
+
+    game->hit_sound = Mix_LoadWAV("./src/assets/hit_sound.wav");
+    if (game->hit_sound == NULL) {
+        write_to_file("Failed to load hit_sound.wav! Mix_Error");
+        return false;
+    }else{write_to_file("Loaded hit noise.");};
+
 
     game->main_sound_loop = Mix_LoadMUS("./src/assets/main_sound_loop.mp3");
     if (game->main_sound_loop == NULL) {

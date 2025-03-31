@@ -1,5 +1,6 @@
 #include <math.h>
 #include <stdio.h>
+#include <time.h>
 #include "player.h"
 #include "constants.h"
 #include "utils.h"
@@ -37,7 +38,7 @@ Color change_particle_color(Color a, Color b, float t) {
     return result;
 }
 
-void spawn_particle(ParticleSystem* ps, Player* player) {
+void spawn_particle(GameState* game, ParticleSystem* ps, Player* player) {
     if (ps->count >= MAX_PARTICLES) return;
 
     // new particle with default values
@@ -65,7 +66,12 @@ void spawn_particle(ParticleSystem* ps, Player* player) {
 
     // get rng color between base and tint
     float color_mix = (float)(rand() % 101) / 100.0f;
-    particle.color = change_particle_color(COLOR_TINT, COLOR_WHITE, color_mix);
+    if (!game->isCollided){
+        particle.color = change_particle_color(COLOR_TINT, COLOR_WHITE, color_mix);
+    }else{
+        particle.color = change_particle_color(COLOR_RED, COLOR_RED2, color_mix);
+    }
+    
 
     // add new partice
     ps->particles[ps->count] = particle;
@@ -181,6 +187,8 @@ void spawn_enemy(GameState* game) {
 }
 
 void update_enemy(GameState* game) {
+    // Uint32 current_time = SDL_GetTicks();
+    // game->player.last_collide_update_time = current_time;
     if (!game->enemy.active) return;
 
     float dx = game->player.x - game->enemy.x;
@@ -202,18 +210,29 @@ void update_enemy(GameState* game) {
     if (game->player.x < game->enemy.x + game->enemy.size &&
         game->player.x + game->player.size > game->enemy.x &&
         game->player.y < game->enemy.y + game->enemy.size &&
-        game->player.y + game->player.size > game->enemy.y) {
-        // game->player.hp -= 20; 
-        float damage_per_second = 20.0f;
-        game->player.hp -= damage_per_second * game->delta_time; 
-        if (game->player.hp <= 0) {
-            game->player.hp = 0;
-            game->game_over = true; 
-            if (Mix_PlayChannel(-1, game->dead_sound, 0) == -1) {
-                printf("Failed to play dead sound! Mix_Error: %s\n", Mix_GetError());
-            } 
-        }
-    }
+        game->player.y + game->player.size > game->enemy.y) 
+        {
+        // conditions from these bounds detection belpw
+        
+            float damage_per_second = 20.0f;
+            game->isCollided = true;
+
+            if (Mix_PlayChannel(-1, game->hit_sound, 0) == -1) {
+                printf("Failed to play hit sound! Mix_Error: %s\n", Mix_GetError());
+            }
+            
+            game->player.hp -= damage_per_second * game->delta_time; 
+            
+            if (game->player.hp <= 0) {
+                game->player.hp = 0;
+                game->game_over = true; 
+                if (Mix_PlayChannel(-1, game->dead_sound, 0) == -1) {
+                    printf("Failed to play dead sound! Mix_Error: %s\n", Mix_GetError());
+                } 
+            }
+
+
+    }else{game->isCollided = false;}
 
 
 }

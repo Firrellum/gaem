@@ -1,4 +1,3 @@
-
 #ifndef ENTITIES_H
 #define ENTITIES_H
 
@@ -11,11 +10,15 @@
 // player data
 typedef struct {
     int hp;
+    int last_hp;
     float x, y;
     int size;
     float speed;
     float dx, dy;
     bool alive;
+    Uint32 last_score_update_time;
+    Uint32 last_hp_update_time;
+    Uint32 last_collide_update_time;
 } Player;
 
 // particle data
@@ -90,6 +93,7 @@ typedef struct GameState {
     double delta_time;
     double last_frame_time;
     int score;
+    int last_score;
     bool game_over;
     Player player;
     ParticleSystem particles;
@@ -108,8 +112,10 @@ typedef struct GameState {
     Mix_Chunk* pick_up_sound;
     Mix_Chunk* dead_sound;
     Mix_Chunk* start_sound;
+    Mix_Chunk* hit_sound;
     Mix_Music* main_sound_loop;
     bool restart_requested;
+    bool isCollided;
 } GameState;
 
 #endif 

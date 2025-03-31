@@ -6,7 +6,8 @@ UIFont loaded
 title_ Font loaded
 Loaded pickup noise.
 Loaded dead noise.
-Loaded start pickup noise.
+Loaded start noise.
+Loaded hit noise.
 Loaded start main_sound_loop noise.
 Created window.
 Created renderer.
