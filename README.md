@@ -53,7 +53,7 @@ This is a simple game side project built using SDL2 in C, designed as a learning
 
 ## Build Prerequisites
 
-- [SDL2](https://github.com/libsdl-org/SDL_image/releases/tag/release-2.8.8) development libraries  
+- [SDL2](https://github.com/libsdl-org/SDL/releases/tag/release-2.32.2) development libraries  
 - [SDL2_ttf](https://github.com/libsdl-org/SDL_ttf/releases/tag/release-2.24.0) development libraries  
 - [SDL2_mixer](https://github.com/libsdl-org/SDL_mixer/releases/tag/release-2.8.1) development libraries 
 - [SDL2_image](https://github.com/libsdl-org/SDL_image/releases/tag/release-2.8.8) development libraries 
