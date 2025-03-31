@@ -30,7 +30,7 @@ This is a simple game side project built using SDL2 in C, designed as a learning
   - `Esc` : Start Screen
 - **Notes**: 
   - Movement momentum is preserved when pausing and resuming mid-motion.
-  - Menu navigation and selection are rate-limited to 0.2-second intervals.
+
 
 ## Current Features
 
@@ -53,8 +53,10 @@ This is a simple game side project built using SDL2 in C, designed as a learning
 
 ## Build Prerequisites
 
-- SDL2 development libraries installed (`libsdl2-dev` on Ubuntu, or equivalent)
-- SDL2_ttf development libraries installed (`libsdl2-ttf-dev` on linux)
+- [SDL2](https://github.com/libsdl-org/SDL_image/releases/tag/release-2.8.8) development libraries  
+- [SDL2_ttf](https://github.com/libsdl-org/SDL_ttf/releases/tag/release-2.24.0) development libraries  
+- [SDL2_mixer](https://github.com/libsdl-org/SDL_mixer/releases/tag/release-2.8.1) development libraries 
+- [SDL2_image](https://github.com/libsdl-org/SDL_image/releases/tag/release-2.8.8) development libraries 
 - A compiler that supports C (GCC recommended)
 - Make (for using the provided Makefile)
 
