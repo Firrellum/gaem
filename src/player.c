@@ -135,12 +135,9 @@ void check_and_respawn_collectibles(GameState* game) {
             active_count++;
         }
     }
-    // printf("Active collectibles: %d\n", active_count);
     if (active_count == 0) {
-        // printf("All collected, sets: %d\n", game->total_collectible_sets + 1);
         game->total_collectible_sets++; 
         spawn_collectibles(game);
-        // printf("Spawning line enemy for set %d\n", game->total_collectible_sets);
         spawn_line_enemy(game); 
     }
 }

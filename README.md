@@ -17,6 +17,7 @@ This is a simple game side project built using SDL2 in C, designed as a learning
 - **Start Screen**:
   - `ENTER`: Start the game...
   - `ESC`: Quit to desktop.
+  - `M` : Mute music.
 - **Playing State**:
   - `WASD` or `Arrow Keys`: Move the player cube (up, down, left, right).
   - `ESC`: Toggle pause menu.
@@ -63,7 +64,7 @@ This is a simple game side project built using SDL2 in C, designed as a learning
 
 - **Sounds**
 [Ambient Loop](https://soundimage.org/sfx-scifi-amb/)
-[Death and Pickup Sounds](https://sfbgames.itch.io/chiptone)
+[Death, start and pickup Sounds](https://sfbgames.itch.io/chiptone)
 
 ---
 

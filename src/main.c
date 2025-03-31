@@ -74,11 +74,27 @@ void reset_game(GameState* game) {
     init_line_enemies(game);
 }
 
+bool isMuted = false;
+
 void handle_inputs(GameState* game, Player* player) {
     SDL_Event event;
 
     while (SDL_PollEvent(&event)) {
+
+       
+
         if (event.type == SDL_KEYDOWN) {
+
+            if(event.key.keysym.sym == SDLK_m){
+                if (!isMuted){
+                    Mix_VolumeMusic(0);
+                    isMuted = true;
+                }else{
+                    Mix_VolumeMusic(MIX_MAX_VOLUME / 8);
+                    isMuted = false;
+                }
+            }
+
             if (event.key.keysym.sym == SDLK_ESCAPE) {
                 if (game->mode == STATE_PLAYING) {
                     game->mode = STATE_PAUSED;  // pause on escape
@@ -107,6 +123,9 @@ void handle_inputs(GameState* game, Player* player) {
                 game->running = false;
             }
             if (game->game_over && event.key.keysym.sym == SDLK_r) {
+                if (Mix_PlayChannel(-1, game->start_sound, 0) == -1) {
+                    printf("Failed to play start sound! Mix_Error: %s\n", Mix_GetError());
+                }
                 game->restart_requested = true;
             }else if (game->game_over && event.key.keysym.sym == SDLK_ESCAPE){
                 game->mode = STATE_START_SCREEN;
