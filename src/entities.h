@@ -85,6 +85,7 @@ typedef struct GameState {
     SDL_Renderer* renderer;
     TTF_Font* font; 
     TTF_Font* ui_font; 
+    TTF_Font* title_font; 
     bool running;
     double delta_time;
     double last_frame_time;

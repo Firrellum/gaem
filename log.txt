@@ -3,6 +3,7 @@ Initialized SDL | VIDEO
 Initialized SDL_TTF.
 Font loaded
 UIFont loaded
+title_ Font loaded
 Loaded pickup noise.
 Loaded dead noise.
 Loaded start pickup noise.

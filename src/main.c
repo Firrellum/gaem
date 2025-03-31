@@ -2,6 +2,7 @@
 #include <SDL2/SDL_ttf.h>
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_mixer.h>
+#include <SDL2/SDL_image.h>
 #include <stdio.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -30,6 +31,7 @@ void update_game(GameState* game);
 void handle_inputs(GameState* game, Player* player);
 void cleanup_and_quit(GameState* game, TTF_Font* font, TTF_Font* ui_font);
 void render_grid_overlay(GameState* game);
+bool load_font(GameState* game);
 
 void write_to_file(const char* text){
     fprintf(file,"%s\n", text);
@@ -190,32 +192,30 @@ void handle_inputs(GameState* game, Player* player) {
 }
 
 void update_game(GameState* game){
-    // get frame time and delay update by it
+    
     int frame_time = SDL_GetTicks() - game->last_frame_time;
         if (frame_time < (FRAME_TARGET_TIME)) {
             SDL_Delay(FRAME_TARGET_TIME - frame_time);
         }
-    // calculate delta time
+    
     calculate_delta_time(game);
     
     // update playe
     // particles | spawn on move | only update while in playing state
     if (game->mode == STATE_PLAYING && !game->game_over) {
-        // printf("Updating player\n");
+        
         update_player(&game->player, game->delta_time);
-        // printf("Updating collectibles\n");
         update_collectibles(game);
-        // printf("Updating enemy\n");
         update_enemy(game);
         update_line_enemies(game);
+
         if (game->particles.spawn_timer >= SPAWN_RATE) {
             game->particles.spawn_timer = 0;
             if (game->player.dx != 0 || game->player.dy != 0) {
-                // printf("Spawning particle\n");
                 spawn_particle(&game->particles, &game->player);
             }
         }
-        // printf("Updating particles\n");
+
         update_particles(&game->particles, game->delta_time);
     }
 }
@@ -251,12 +251,33 @@ void setup(GameState* game){
     
     game->menu_cooldown = 0.0f;
 
-    game->ui_info.options[0] = (UiOptions){"Score: "};
-    game->ui_info.options[0] = (UiOptions){"HP: "};
+    // game->ui_info.options[0] = (UiOptions){"Score: "};
+    // game->ui_info.options[0] = (UiOptions){"HP: "};
     write_to_file("Spawn cube and menus.");
+}
 
+bool load_font(GameState* game){
+
+    game->font = TTF_OpenFont("./src/assets/font.ttf", 48);
+    if(!game->font){
+        write_to_file("Error loading font.");
+        return false;
+    }else{ write_to_file("Font loaded");};
     
+    game->ui_font = TTF_OpenFont("./src/assets/font.ttf", 72);
+    if(!game->ui_font){
+        write_to_file("Error loading ui_font.");
+        return false;
+    }else{ write_to_file("UIFont loaded");};
 
+    game->title_font = TTF_OpenFont("./src/assets/font.ttf", 96);
+    if(!game->title_font){
+        write_to_file("Error loading title_font.");
+        return false;
+    }else{ write_to_file("title_ Font loaded");};
+
+    return true;
+    
 }
 
 bool init_game(GameState* game){
@@ -264,7 +285,7 @@ bool init_game(GameState* game){
     file = fopen("log.txt", "w");
     write_to_file("Hello Game!");
 
-    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) < 0){
+    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | IMG_INIT_PNG) < 0){
         write_to_file("Error initializing SDL.");
         return false;
     } else { write_to_file("Initialized SDL | VIDEO");};
@@ -274,17 +295,8 @@ bool init_game(GameState* game){
         return false;
     } else { write_to_file("Initialized SDL_TTF.");};
 
-    game->font = TTF_OpenFont("./src/assets/font.ttf", 48);
-    if(!game->font){
-        write_to_file("Error loading font.");
-        return false;
-    }else{ write_to_file("Font loaded");};
-
-    game->ui_font = TTF_OpenFont("./src/assets/font.ttf", 72);
-    if(!game->ui_font){
-        write_to_file("Error loading ui_font.");
-        return false;
-    }else{ write_to_file("UIFont loaded");};
+    
+    load_font(game);
     
     printf("Initializing SDL_mixer...\n");
     if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0) {
@@ -322,6 +334,8 @@ bool init_game(GameState* game){
         write_to_file("Failed to play main_sound_loop! Mix_Error");
         return false;
     } 
+
+    // SDL_Texture* loadTexture(const char* file, SDL_)
 
     game->window = SDL_CreateWindow(
         NULL, // window name
