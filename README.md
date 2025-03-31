@@ -65,8 +65,8 @@ This is a simple game side project built using SDL2 in C, designed as a learning
 ## Credits
 
 - **Sounds**
-[Ambient Loop](https://soundimage.org/sfx-scifi-amb/)
-[Death, start and pickup Sounds](https://sfbgames.itch.io/chiptone)
+- [Ambient Loop](https://soundimage.org/sfx-scifi-amb/)
+- [Death, start and pickup Sounds](https://sfbgames.itch.io/chiptone)
 
 ---
 
