@@ -221,7 +221,10 @@ void update_game(GameState* game){
     
     calculate_delta_time(game);
     
-    // update playe
+    game->animation_time += game->delta_time;
+    game->title_y = 200.0f + sinf(game->animation_time * 1.0f) * 30.0f;
+
+    // update player
     // particles | spawn on move | only update while in playing state
     if (game->mode == STATE_PLAYING && !game->game_over) {
         
@@ -262,6 +265,8 @@ void setup(GameState* game){
     game->player.last_hp = 100;
     game->player.last_collide_update_time = 1;
     game->last_score = 0;
+    game->title_y = 200.0f; 
+    game->animation_time = 0.0f;
     spawn_collectibles(game);
     spawn_enemy(game);
     game->restart_requested = false;

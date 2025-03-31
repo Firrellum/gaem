@@ -121,13 +121,13 @@ void render_start_screen(GameState* game) {
 
     // create the textures with the fonts
     SDL_Texture* game_title_texture = render_text(game->renderer, "F Cubed", game->title_font, title_color);
-    SDL_Texture* button_text_texture = render_text(game->renderer, "ENTER to Start", game->font, button_color);
+    SDL_Texture* button_text_texture = render_text(game->renderer, "Enter to start..", game->font, button_color);
 
     // render 'button'
-    render_text_at(game->renderer, button_text_texture, WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2, true);
+    render_text_at(game->renderer, button_text_texture, WINDOW_WIDTH / 2, 400, true);
 
     // render title text
-    render_text_at(game->renderer, game_title_texture, WINDOW_WIDTH / 2, 150, true);
+    render_text_at(game->renderer, game_title_texture, WINDOW_WIDTH / 2, game->title_y, true);
 
     // TODO refactor the repetition here
     SDL_DestroyTexture(game_title_texture);
@@ -175,14 +175,14 @@ void render_game(GameState* game) {
     SDL_RenderClear(game->renderer);
 
     if (game->mode == STATE_START_SCREEN) {
-
+        render_grid_overlay(game);
         render_start_screen(game); 
         render_border(game);
         // render_enemy(game);
         // render_player_cube(&game->player, game->renderer);
 
     } else if (game->mode == STATE_PLAYING) {
-        
+        render_grid_overlay(game);
         render_border(game);
         render_particles(&game->particles, game->renderer);
         render_player_cube(&game->player, game->renderer);
@@ -192,6 +192,7 @@ void render_game(GameState* game) {
         render_gameplay_ui(game);
         
         if (game->game_over) {
+            render_grid_overlay(game);
             SDL_Texture* game_over_texture = render_text(game->renderer, "Game Over", game->font, SELECTED_COLOR);
             render_text_at(game->renderer, game_over_texture, WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2, true);
             SDL_DestroyTexture(game_over_texture);
@@ -200,15 +201,14 @@ void render_game(GameState* game) {
             SDL_DestroyTexture(restart_texture);
         }
     } else if (game->mode == STATE_PAUSED) {
-        
         render_particles(&game->particles, game->renderer);
         render_player_cube(&game->player, game->renderer);
         render_collectibles(game);
         render_enemy(game);
         render_pause_menu(game);
+        render_grid_overlay(game);
         render_border(game);
     }
-    
-    render_grid_overlay(game);
+
     SDL_RenderPresent(game->renderer);
 }

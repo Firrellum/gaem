@@ -116,6 +116,8 @@ typedef struct GameState {
     Mix_Music* main_sound_loop;
     bool restart_requested;
     bool isCollided;
+    float title_y;
+    float animation_time;
 } GameState;
 
 #endif 
