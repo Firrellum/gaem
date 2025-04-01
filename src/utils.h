@@ -9,10 +9,6 @@ typedef struct {
     Uint8 r, g, b;
 } Color;
 
-// typedef struct {
-//     Uint8 r, g , b, a; 
-// } ColorAlpha;
-
 #define COLOR_WHITE (Color){255, 255, 255} // white
 #define COLOR_TINT (Color){000, 255, 255} // tint color
 #define COLOR_RED (Color){255, 000, 0} // tint color

@@ -11,7 +11,7 @@
 #define MENU_BACKDROP (SDL_Color){20,20,20,128}
 #define SELECTED_COLOR (SDL_Color){000, 255, 255, 255}
 
-#define GRID_CELL_SIZE 24
+#define GRID_CELL_SIZE 12
 #define GRID_COLOR (SDL_Color) {150, 150, 150, 50}
 
 #define FPS 120

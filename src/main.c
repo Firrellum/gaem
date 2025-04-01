@@ -17,21 +17,18 @@
 
 FILE *file; // use write_to_file(); to output to the log.txt
 
-bool init_game(GameState* game);
 void write_to_file(const char *text);
+bool init_game(GameState* game);
+bool load_font(GameState* game);
 void setup(GameState* game);
 void calculate_delta_time(GameState* game);
-void render_game(GameState* game);
-void render_gameplay_ui(GameState* game);
-void render_start_screen(GameState* game);
-SDL_Texture* render_text(SDL_Renderer* renderer, const char* text, TTF_Font* font, SDL_Color fg);
-void render_text_at(SDL_Renderer* renderer, SDL_Texture* texture, int x, int y);
-void render_border(GameState* game);
 void update_game(GameState* game);
 void handle_inputs(GameState* game, Player* player);
+void render_game(GameState* game);
+void reset_game(GameState* game);
 void cleanup_and_quit(GameState* game, TTF_Font* font, TTF_Font* ui_font);
-void render_grid_overlay(GameState* game);
-bool load_font(GameState* game);
+
+
 
 void write_to_file(const char* text){
     fprintf(file,"%s\n", text);
@@ -326,7 +323,6 @@ bool init_game(GameState* game){
         return false;
     } else { write_to_file("Initialized SDL_TTF.");};
 
-    
     load_font(game);
     
     printf("Initializing SDL_mixer...\n");
