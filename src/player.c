@@ -3,7 +3,6 @@
 #include <time.h>
 #include "player.h"
 #include "constants.h"
-#include "utils.h"
 #include "mechanics.h"
 
 // player 

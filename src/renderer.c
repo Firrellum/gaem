@@ -4,7 +4,6 @@
 #include <SDL2/SDL_ttf.h>
 #include <time.h>
 #include "constants.h"
-#include "utils.h"
 #include "entities.h"
 #include "player.h"
 #include "renderer.h"

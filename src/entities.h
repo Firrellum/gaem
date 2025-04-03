@@ -4,8 +4,17 @@
 #include <stdbool.h>
 #include <SDL2/SDL.h>
 #include "constants.h"
-#include "utils.h"
 #include <SDL2/SDL_mixer.h>
+
+typedef struct {
+    Uint8 r, g, b;
+} Color;
+
+typedef enum {
+    STATE_START_SCREEN,
+    STATE_PLAYING,
+    STATE_PAUSED,
+} GameMode;
 
 // player data
 typedef struct {

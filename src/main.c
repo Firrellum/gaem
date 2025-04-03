@@ -12,7 +12,6 @@
 #include "constants.h"
 #include "entities.h"
 #include "player.h"
-#include "utils.h"
 #include "mechanics.h"
 
 FILE *file; // use write_to_file(); to output to the log.txt
