@@ -123,11 +123,35 @@ void render_particles(ParticleSystem* ps, SDL_Renderer* renderer) {
     }
 }
 
+int get_rand_collectible_pos(char axis){
+    
+    if(axis == 'y'){
+        return BORDER_SIZE + (rand() % (WINDOW_HEIGHT - 2 * BORDER_SIZE - PLAYER_SIZE));
+    }else{
+        return BORDER_SIZE + (rand() % (WINDOW_WIDTH - 2 * BORDER_SIZE - PLAYER_SIZE));
+    }
+}
+
 void spawn_collectibles(GameState* game) {
     game->collectible_count = 5; // Fixed number for now
     for (int i = 0; i < game->collectible_count; i++) {
-        game->collectibles[i].x = BORDER_SIZE + (rand() % (WINDOW_WIDTH - 2 * BORDER_SIZE - PLAYER_SIZE));
-        game->collectibles[i].y = BORDER_SIZE + (rand() % (WINDOW_HEIGHT - 2 * BORDER_SIZE - PLAYER_SIZE));
+        // TODO : make a condition to respawn if collectable is behind score or hp
+        int x_collectible_pos = get_rand_collectible_pos('x');
+        int y_collectible_pos = get_rand_collectible_pos('y');
+        
+        while (x_collectible_pos < 112 && y_collectible_pos < 72){
+            x_collectible_pos = get_rand_collectible_pos('x');
+            y_collectible_pos = get_rand_collectible_pos('y');
+        }
+
+        while (x_collectible_pos > 1168 && y_collectible_pos < 72){
+            x_collectible_pos = get_rand_collectible_pos('x');
+            y_collectible_pos = get_rand_collectible_pos('y');
+        }
+
+        game->collectibles[i].x = x_collectible_pos;
+        game->collectibles[i].y = y_collectible_pos;
+        
         game->collectibles[i].size = PLAYER_SIZE / 2; // Smaller than player
         game->collectibles[i].active = true;
     }

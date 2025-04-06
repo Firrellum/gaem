@@ -13,6 +13,9 @@ Created window.
 Created renderer.
 Failed to load F icon.
 Spawn cube and menus.
+Settings selected (not implemented yet).
+Settings selected (not implemented yet).
+Settings selected (not implemented yet).
 Destroying renderer.
 Destroying window.
 Closing ttfS.

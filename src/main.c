@@ -391,8 +391,8 @@ bool init_game(GameState* game){
 
     SDL_Surface* icon = IMG_Load("./src/assets/F_icon_transparent.ico");
     if (!icon){
-        write_to_file("Failed to load F icon.");
-    }else{write_to_file("F Icon loaded.");};
+        write_to_file("F Icon loaded.");
+    }else{write_to_file("Failed to load F icon.");};
 
     SDL_SetWindowIcon(game->window, icon);
     SDL_FreeSurface(icon);

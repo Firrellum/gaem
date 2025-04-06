@@ -14,7 +14,7 @@
 #define COLOR_WHITE (Color){255, 255, 255} // white
 #define COLOR_TINT (Color){000, 255, 255} // tint color
 #define COLOR_RED (Color){255, 000, 0} // tint color
-#define COLOR_RED2 (Color){200, 000, 0} // tint color
+#define COLOR_RED2 (Color){100, 000, 0} // tint color
 
 #define GRID_CELL_SIZE 12
 #define GRID_COLOR (SDL_Color) {150, 150, 150, 50}
