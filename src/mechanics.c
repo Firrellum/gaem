@@ -3,7 +3,6 @@
 #include <stdio.h>
 #include "mechanics.h"
 #include "constants.h"
-#include "utils.h"
 
 void init_line_enemies(GameState* game) {
     game->line_enemy_count = 0;

@@ -192,9 +192,17 @@ void render_game(GameState* game) {
         
         if (game->game_over) {
             render_grid_overlay(game);
+            
             SDL_Texture* game_over_texture = render_text(game->renderer, "Game Over", game->font, SELECTED_COLOR);
-            render_text_at(game->renderer, game_over_texture, WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2, true);
+            render_text_at(game->renderer, game_over_texture, WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2 - 50, true);
             SDL_DestroyTexture(game_over_texture);
+            
+            char score_text[32];
+            snprintf(score_text, sizeof(score_text), "Score : %d", game->score);
+            SDL_Texture* game_over_score = render_text(game->renderer, score_text, game->font, BASE_COLOR);
+            render_text_at(game->renderer, game_over_score, WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2, true);
+            SDL_DestroyTexture(game_over_score);
+
             SDL_Texture* restart_texture = render_text(game->renderer, "Press R to Restart", game->font, BASE_COLOR);
             render_text_at(game->renderer, restart_texture, WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2 + 50, true);
             SDL_DestroyTexture(restart_texture);
