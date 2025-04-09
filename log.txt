@@ -11,11 +11,8 @@ Loaded hit noise.
 Loaded start main_sound_loop noise.
 Created window.
 Created renderer.
-Failed to load F icon.
+F Icon loaded.
 Spawn cube and menus.
-Settings selected (not implemented yet).
-Settings selected (not implemented yet).
-Settings selected (not implemented yet).
 Destroying renderer.
 Destroying window.
 Closing ttfS.

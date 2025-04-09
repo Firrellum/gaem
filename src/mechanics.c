@@ -31,7 +31,7 @@ void spawn_line_enemy(GameState* game) {
         case 0: // Left
             line->start_x = BORDER_SIZE;
             // Random Y position, snapped to grid
-            line->start_y = BORDER_SIZE + (rand() % (WINDOW_HEIGHT - 2 * BORDER_SIZE));
+            line->start_y = BORDER_SIZE + (rand() % (WINDOW_HEIGHT - 2 * BORDER_SIZE - 2 * GRID_SIZE));
             line->start_y = BORDER_SIZE + round((line->start_y - BORDER_SIZE) / (float)GRID_SIZE) * GRID_SIZE;
             line->start_y -= 1.5;
             line->target_x = WINDOW_WIDTH - BORDER_SIZE; // Reach the edge
@@ -40,7 +40,7 @@ void spawn_line_enemy(GameState* game) {
         case 1: // Right
             line->start_x = WINDOW_WIDTH - BORDER_SIZE; // Start at the edge
             // Random Y position, snapped to grid
-            line->start_y = BORDER_SIZE + (rand() % (WINDOW_HEIGHT - 2 * BORDER_SIZE));
+            line->start_y = BORDER_SIZE + (rand() % (WINDOW_HEIGHT - 2 * BORDER_SIZE - 2 * GRID_SIZE));
             line->start_y = BORDER_SIZE + round((line->start_y - BORDER_SIZE) / (float)GRID_SIZE) * GRID_SIZE;
             line->start_y -= 1.5;
             line->target_x = BORDER_SIZE; // Reach the edge
@@ -48,7 +48,7 @@ void spawn_line_enemy(GameState* game) {
             break;
         case 2: // Top
             // Random X position, snapped to grid
-            line->start_x = BORDER_SIZE + (rand() % (WINDOW_WIDTH - 2 * BORDER_SIZE));
+            line->start_x = BORDER_SIZE + (rand() % (WINDOW_WIDTH - 2 * BORDER_SIZE - 2 * GRID_SIZE));
             line->start_x = BORDER_SIZE + round((line->start_x - BORDER_SIZE) / (float)GRID_SIZE) * GRID_SIZE;
             line->start_x -= 1.5;
             line->start_y = BORDER_SIZE;
@@ -57,7 +57,7 @@ void spawn_line_enemy(GameState* game) {
             break;
         case 3: // Bottom
             // Random X position, snapped to grid
-            line->start_x = BORDER_SIZE + (rand() % (WINDOW_WIDTH - 2 * BORDER_SIZE));
+            line->start_x = BORDER_SIZE + (rand() % (WINDOW_WIDTH - 2 * BORDER_SIZE - 2 * GRID_SIZE));
             line->start_x = BORDER_SIZE + round((line->start_x - BORDER_SIZE) / (float)GRID_SIZE) * GRID_SIZE;
             line->start_x -= 1.5;
             line->start_y = WINDOW_HEIGHT - BORDER_SIZE;

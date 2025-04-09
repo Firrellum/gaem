@@ -25,6 +25,7 @@ void update_player(Player* player, float delta_time) {
     if (player->y < BORDER_SIZE) player->y = BORDER_SIZE;
     if (player->y > WINDOW_HEIGHT - player->size - BORDER_SIZE) player->y = WINDOW_HEIGHT - player->size - BORDER_SIZE;
     
+    printf("X : %f  Y : %f\n", player->x, player->y);
 }
 
 // player | particles 
@@ -124,7 +125,6 @@ void render_particles(ParticleSystem* ps, SDL_Renderer* renderer) {
 }
 
 int get_rand_collectible_pos(char axis){
-    
     if(axis == 'y'){
         return BORDER_SIZE + (rand() % (WINDOW_HEIGHT - 2 * BORDER_SIZE - PLAYER_SIZE));
     }else{
@@ -133,18 +133,22 @@ int get_rand_collectible_pos(char axis){
 }
 
 void spawn_collectibles(GameState* game) {
+    const int UI_X_MIN = 150;
+    const int UI_X_MAX = 1130;
+    const int UI_Y_OFFSET = 72;
     game->collectible_count = 5; // Fixed number for now
+    
     for (int i = 0; i < game->collectible_count; i++) {
         // TODO : make a condition to respawn if collectable is behind score or hp
         int x_collectible_pos = get_rand_collectible_pos('x');
         int y_collectible_pos = get_rand_collectible_pos('y');
         
-        while (x_collectible_pos < 112 && y_collectible_pos < 72){
+        while (x_collectible_pos < UI_X_MIN && y_collectible_pos < UI_Y_OFFSET){
             x_collectible_pos = get_rand_collectible_pos('x');
             y_collectible_pos = get_rand_collectible_pos('y');
         }
 
-        while (x_collectible_pos > 1168 && y_collectible_pos < 72){
+        while (x_collectible_pos > UI_X_MAX && y_collectible_pos < UI_Y_OFFSET){
             x_collectible_pos = get_rand_collectible_pos('x');
             y_collectible_pos = get_rand_collectible_pos('y');
         }
