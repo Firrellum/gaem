@@ -9,20 +9,22 @@
 #include "renderer.h"
 #include "mechanics.h"
 
+// writes a string to a file
 void write_to_file(const char *text);
-
+// renders the entire game scene
 void render_game(GameState* game);
-
+// renders the gameplay UI elements like score, health, etc.
 void render_gameplay_ui(GameState* game);
-
+// renders the start screen before gameplay starts
 void render_start_screen(GameState* game);
-
+// renders text at a specific position
+// if centered is true, the text is centered at the given position
 void render_text_at(SDL_Renderer* renderer, SDL_Texture* texture, int x, int y, bool centered);
-
+// renders the game border on screen
 void render_border(GameState* game);
-
+// renders the given text into a texture, using the provided font and color
 SDL_Texture* render_text(SDL_Renderer* renderer, const char* text, TTF_Font* font, SDL_Color fg);
-
+// renders a grid overlay, useful for debugging or showing grid-based layouts
 void render_grid_overlay(GameState* game);
 
 SDL_Texture* render_text(SDL_Renderer* renderer, const char* text, TTF_Font* font, SDL_Color fg) {

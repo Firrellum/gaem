@@ -16,34 +16,24 @@
 
 FILE *file; 
 // use write_to_file(); to output to the log.txt
-
 // writes a line of text to the log file
 void write_to_file(const char *text);
-
 // sets up sdl and other subsystems
 bool init_game(GameState* game);
-
 // loads the main game font
 bool load_font(GameState* game);
-
 // initializes game state variables
 void setup(GameState* game);
-
 // updates delta time based on frame duration
 void calculate_delta_time(GameState* game);
-
 // handles logic updates per frame
 void update_game(GameState* game);
-
 // processes keyboard and controller input
 void handle_inputs(GameState* game, Player* player);
-
 // draws everything to the screen
 void render_game(GameState* game);
-
 // resets everything to initial state
 void reset_game(GameState* game);
-
 // frees resources and exits cleanly
 void cleanup_and_quit(GameState* game, TTF_Font* font, TTF_Font* ui_font);
 
