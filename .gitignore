@@ -1,6 +1,6 @@
-*.exe
-unused/
 .vscode/
 
+
+*.exe
 *.o
 *.txt
