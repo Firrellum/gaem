@@ -3,4 +3,4 @@ unused/
 .vscode/
 
 *.o
-direction.txt
+*.txt
