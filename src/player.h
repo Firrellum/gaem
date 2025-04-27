@@ -40,5 +40,7 @@ void render_enemy(GameState* game);
 // checks if collectibles should respawn and does so if necessary
 void check_and_respawn_collectibles(GameState* game);  
 
+// spawns a health pickup at a random position
+void spawn_health_pickup(GameState* game);
 
 #endif

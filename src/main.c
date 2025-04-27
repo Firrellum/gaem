@@ -123,6 +123,12 @@ void reset_game(GameState* game) {
 
     // reinit line enemies
     init_line_enemies(game);
+
+    // clear power-ups
+    game->power_up_count = 0;
+    for (int i = 0; i < 3; i++) {
+        game->power_ups[i].active = false;
+    }
 }
 
 bool isMuted = false;
@@ -374,6 +380,12 @@ void setup(GameState* game){
 
     // reset cooldown for menu input
     game->menu_cooldown = 0.0f;
+
+    // initialize power-ups
+    game->power_up_count = 0;
+    for (int i = 0; i < 3; i++) {
+        game->power_ups[i].active = false;
+    }
 
     // note setup finished
     write_to_file("Spawn cube and menus.");

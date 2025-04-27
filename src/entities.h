@@ -8,6 +8,13 @@
 #include <SDL2/SDL_ttf.h>
 
 typedef struct {
+    float x, y;
+    int size;
+    bool active;
+    enum { HEALTH_PICKUP } type; 
+} PowerUp;
+
+typedef struct {
     Uint8 r, g, b;
 } Color;
 
@@ -128,6 +135,8 @@ typedef struct GameState {
     bool isCollided;
     float title_y;
     float animation_time;
+    PowerUp power_ups[3]; 
+    int power_up_count;
 } GameState;
 
 #endif 

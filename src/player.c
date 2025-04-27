@@ -165,6 +165,33 @@ void spawn_collectibles(GameState* game) {
     }
 }
 
+void spawn_health_pickup(GameState* game) {
+    if (game->power_up_count >= 3) return; // max 3 power-ups at a time
+
+    PowerUp* pickup = &game->power_ups[game->power_up_count];
+    pickup->active = true;
+    pickup->type = HEALTH_PICKUP;
+    pickup->size = PLAYER_SIZE / 2; // same size as collectibles
+
+    const int UI_X_MIN = 150;
+    const int UI_X_MAX = 1130;
+    const int UI_Y_OFFSET = 72;
+
+    // generate random position
+    int x_pos = get_rand_collectible_pos('x');
+    int y_pos = get_rand_collectible_pos('y');
+
+    // avoid UI overlap
+    while ((x_pos < UI_X_MIN && y_pos < UI_Y_OFFSET) || (x_pos > UI_X_MAX && y_pos < UI_Y_OFFSET)) {
+        x_pos = get_rand_collectible_pos('x');
+        y_pos = get_rand_collectible_pos('y');
+    }
+
+    pickup->x = x_pos;
+    pickup->y = y_pos;
+    game->power_up_count++;
+}
+
 void check_and_respawn_collectibles(GameState* game) {
     int active_count = 0;
     
@@ -175,11 +202,16 @@ void check_and_respawn_collectibles(GameState* game) {
         }
     }
 
-    // if no active collectibles, respawn a new set and a new enemy
-    if (active_count == 0) {
+     // if no active collectibles, respawn a new set and a new enemy
+     if (active_count == 0) {
         game->total_collectible_sets++;  // increase the number of collectible sets
         spawn_collectibles(game);         // spawn new collectibles
         spawn_line_enemy(game);          // spawn a new line enemy
+
+        // 10% chance to spawn a health pickup
+        if ((rand() % 100) < 10) { 
+            spawn_health_pickup(game);
+        }
     }
 }
 
@@ -203,6 +235,37 @@ void update_collectibles(GameState* game) {
             }          
         }
     }
+
+    // update health pickups
+    for (int i = 0; i < game->power_up_count; i++) {
+        if (!game->power_ups[i].active) continue;
+
+        PowerUp* pickup = &game->power_ups[i];
+        if (game->player.x < pickup->x + pickup->size &&
+            game->player.x + game->player.size > pickup->x &&
+            game->player.y < pickup->y + pickup->size &&
+            game->player.y + game->player.size > pickup->y) {
+            
+            // handle health pickup
+            if (pickup->type == HEALTH_PICKUP) {
+                game->player.hp += 25; // restore 25 HP
+                if (game->player.hp > 100) game->player.hp = 100; // cap at 100
+                pickup->active = false; // deactivate pickup
+
+                // play pick-up sound
+                if (Mix_PlayChannel(-1, game->pick_up_sound, 0) == -1) {
+                    printf("Failed to play pick_up sound! Mix_Error: %s\n", Mix_GetError());
+                }
+
+                // shift remaining power-ups
+                for (int j = i; j < game->power_up_count - 1; j++) {
+                    game->power_ups[j] = game->power_ups[j + 1];
+                }
+                game->power_up_count--;
+                i--;
+            }
+        }
+    }
     
     // check if all collectibles are collected and respawn them
     check_and_respawn_collectibles(game);
@@ -219,6 +282,15 @@ void render_collectibles(GameState* game) {
             SDL_RenderFillRect(game->renderer, &collectible_rect);
         }
     }
+    // render health pickups
+    SDL_SetRenderDrawColor(game->renderer, 0, 255, 0, 255); // green color for health pickups
+    for (int i = 0; i < game->power_up_count; i++) {
+        if (game->power_ups[i].active) {
+            SDL_Rect pickup_rect = {(int)game->power_ups[i].x, (int)game->power_ups[i].y, 
+                                    game->power_ups[i].size, game->power_ups[i].size};
+            SDL_RenderFillRect(game->renderer, &pickup_rect);
+        }
+    }
 }
 
 void spawn_enemy(GameState* game) {
@@ -231,6 +303,9 @@ void spawn_enemy(GameState* game) {
 
 void update_enemy(GameState* game) {
     if (!game->enemy.active) return; // skip if enemy is not active
+
+    float difficulty_factor = 1.0f + (game->score / 50.0f) * 0.1f;
+    game->enemy.speed = 150.0f * difficulty_factor;
 
     float dx = game->player.x - game->enemy.x; // calculate x distance to player
     float dy = game->player.y - game->enemy.y; // calculate y distance to player
