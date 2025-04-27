@@ -25,5 +25,6 @@ SDL_Texture* render_text(SDL_Renderer* renderer, const char* text, TTF_Font* fon
 // renders a grid overlay on the screen, typically for alignment or visual effects
 void render_grid_overlay(GameState* game);
 
+void render_settings_menu(GameState* game);
 
 #endif 

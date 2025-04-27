@@ -166,8 +166,6 @@ void handle_inputs(GameState* game, Player* player) {
                     game->mode = STATE_PLAYING;
                     player->dx = game->paused_dx;
                     player->dy = game->paused_dy;
-                }else if (game->mode == STATE_SETTINGS) {
-                    game->mode = STATE_PAUSED; 
                 }
             }
 
@@ -265,14 +263,9 @@ void handle_inputs(GameState* game, Player* player) {
             switch (game->pause_menu.selected_index) {
                 case 0:
                     game->mode = STATE_PLAYING;
-                    player->dx = game->paused_dx;
-                    player->dy = game->paused_dy;
                     break;
                 case 1:
-                    game->mode = STATE_SETTINGS;
-                    game->settings_menu.selected_index = 0;
-                    game->settings_menu.options[0].selected = true;
-                    write_to_file("Entered settings menu.");
+                    write_to_file("Settings selected (not implemented yet).");
                     break;
                 case 2:
                     game->mode = STATE_START_SCREEN;
@@ -282,83 +275,7 @@ void handle_inputs(GameState* game, Player* player) {
                     break;
                 case 3:
                     // exit handled earlier
-                    game->running = false;
                     break;
-            }
-            game->menu_cooldown = MENU_DELAY_LOCAL;
-        }
-    } else if (game->mode == STATE_SETTINGS){
-        const Uint8* keyboard_state = SDL_GetKeyboardState(NULL);
-        const float MENU_DELAY_LOCAL = MENU_DELAY;
-
-        if (game->menu_cooldown > 0)
-        {
-            game->menu_cooldown -= game->delta_time;
-        }
-        
-        if (keyboard_state[SDL_SCANCODE_UP] && game->settings_menu.selected_index > 0 && game->menu_cooldown <= 0) {
-            game->settings_menu.options[game->settings_menu.selected_index].selected = false;
-            game->settings_menu.selected_index--;
-            game->settings_menu.options[game->settings_menu.selected_index].selected = true;
-            game->menu_cooldown = MENU_DELAY_LOCAL;
-        }
-
-        if (keyboard_state[SDL_SCANCODE_DOWN] && game->settings_menu.selected_index < game->settings_menu.option_count - 1 && game->menu_cooldown <= 0) {
-            game->settings_menu.options[game->settings_menu.selected_index].selected = false;
-            game->settings_menu.selected_index++;
-            game->settings_menu.options[game->settings_menu.selected_index].selected = true;
-            game->menu_cooldown = MENU_DELAY_LOCAL;
-        }
-
-        if (keyboard_state[SDL_SCANCODE_LEFT] && game->menu_cooldown <= 0) {
-            switch (game->settings_menu.selected_index) {
-                case 0: // music 
-                    game->music_volume = (game->music_volume > 0) ? game->music_volume - 8 : 0;
-                    Mix_VolumeMusic(isMuted ? 0 : game->music_volume);
-                    write_to_file("Decreased music volume.");
-                    break;
-                case 1: // sfx
-                    game->sfx_volume = (game->sfx_volume > 0) ? game->sfx_volume - 8 : 0;
-                    Mix_Volume(-1, game->sfx_volume);
-                    break;
-                case 2: // frame
-                    if (game->target_fps == 120) game->target_fps = 60;
-                    else if (game->target_fps == 60) game->target_fps = 0; // uncapped
-                    else game->target_fps = 120;
-                    write_to_file("Changed frame rate.");
-                    break;
-            }
-            game->menu_cooldown = MENU_DELAY_LOCAL;
-        }
-
-        if (keyboard_state[SDL_SCANCODE_RIGHT] && game->menu_cooldown <= 0) {
-            switch (game->settings_menu.selected_index) {
-                case 0: 
-                    game->music_volume = (game->music_volume < 128) ? game->music_volume + 8 : 128;
-                    Mix_VolumeMusic(isMuted ? 0 : game->music_volume);
-                    write_to_file("Increased music volume.");
-                    break;
-                case 1: 
-                    game->sfx_volume = (game->sfx_volume < 128) ? game->sfx_volume + 8 : 128;
-                    Mix_Volume(-1, game->sfx_volume);
-                    break;
-                case 2: 
-                    if (game->target_fps == 0) game->target_fps = 60;
-                    else if (game->target_fps == 60) game->target_fps = 120;
-                    else game->target_fps = 0; 
-                    write_to_file("Changed frame rate.");
-                    break;
-            }
-
-            game->menu_cooldown = MENU_DELAY_LOCAL;
-        }
-
-        if (keyboard_state[SDL_SCANCODE_RETURN] && game->menu_cooldown <= 0) {
-            if (game->settings_menu.selected_index == 3) { 
-                game->mode = STATE_PAUSED;
-                game->settings_menu.options[game->settings_menu.selected_index].selected = false;
-                game->pause_menu.options[game->pause_menu.selected_index].selected = true;
-                write_to_file("Selected Back from settings menu.");
             }
             game->menu_cooldown = MENU_DELAY_LOCAL;
         }
@@ -366,20 +283,13 @@ void handle_inputs(GameState* game, Player* player) {
 }
 
 void update_game(GameState* game){
-    Uint32 frame_start = SDL_GetTicks();
+    
     // get time since last frame
     int frame_time = SDL_GetTicks() - game->last_frame_time;
 
-    float frame_target_time = game->target_fps > 0 ? (1000.0 / game->target_fps) : 0;
-    
-
     // delay to cap frame rate
-    // if (frame_time < (FRAME_TARGET_TIME)) {
-    //     SDL_Delay(FRAME_TARGET_TIME - frame_time);
-    // }
-
-    if (frame_time < frame_target_time) {
-        SDL_Delay(frame_target_time - frame_time);
+    if (frame_time < (FRAME_TARGET_TIME)) {
+        SDL_Delay(FRAME_TARGET_TIME - frame_time);
     }
     
     // compute delta time
@@ -418,28 +328,6 @@ void update_game(GameState* game){
 
         // update existing particles
         update_particles(&game->particles, game->delta_time);
-    }
-
-    // cap frame rate if not uncapped
-    if (game->target_fps > 0) {
-        Uint32 frame_time = SDL_GetTicks() - frame_start;
-        if (frame_time < frame_target_time) {
-            SDL_Delay((Uint32)(frame_target_time - frame_time));
-        }
-    }
-
-    // log fps for debugging
-    static Uint32 last_log_time = 0;
-    static int frame_count = 0;
-    frame_count++;
-    Uint32 current_time = SDL_GetTicks();
-    if (current_time - last_log_time >= 1000) { // log every second
-        float fps = frame_count / ((current_time - last_log_time) / 1000.0f);
-        char log_msg[64];
-        snprintf(log_msg, sizeof(log_msg), "Current FPS: %.2f, Target FPS: %d", fps, game->target_fps);
-        write_to_file(log_msg);
-        frame_count = 0;
-        last_log_time = current_time;
     }
 }
 
@@ -490,14 +378,6 @@ void setup(GameState* game){
     game->pause_menu.selected_index = 0;
     game->pause_menu.options[game->pause_menu.selected_index].selected = true;
 
-    game->settings_menu.options[0] = (MenuOption){"Music Volume", false};
-    game->settings_menu.options[1] = (MenuOption){"SFX Volume", false};
-    game->settings_menu.options[2] = (MenuOption){"Frame Rate", false};
-    game->settings_menu.options[3] = (MenuOption){"Back", false}; 
-    game->settings_menu.option_count = 4;
-    game->settings_menu.selected_index = 0;
-    game->settings_menu.options[game->settings_menu.selected_index].selected = true;
-
     // reset cooldown for menu input
     game->menu_cooldown = 0.0f;
 
@@ -507,14 +387,8 @@ void setup(GameState* game){
         game->power_ups[i].active = false;
     }
 
-    game->music_volume = DEFAULT_MUSIC_VOLUME;
-    game->sfx_volume = DEFAULT_SFX_VOLUME;
-    game->target_fps = DEFAULT_FPS;
-    Mix_VolumeMusic(game->music_volume);
-    Mix_Volume(-1, game->sfx_volume);
-
     // note setup finished
-    write_to_file("Spawn cube, menus, and power-ups.");
+    write_to_file("Spawn cube and menus.");
 }
 
 bool load_font(GameState* game){
@@ -636,7 +510,7 @@ bool init_game(GameState* game){
 
     // create renderer with gpu acceleration and vsync
     game->renderer = SDL_CreateRenderer(game->window, -1,
-        SDL_RENDERER_ACCELERATED); // | SDL_RENDERER_PRESENTVSYNC
+        SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 
     if(!game->renderer){
         write_to_file("Error creating SDL renderer!");

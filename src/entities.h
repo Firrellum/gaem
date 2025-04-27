@@ -22,6 +22,7 @@ typedef enum {
     STATE_START_SCREEN,
     STATE_PLAYING,
     STATE_PAUSED,
+    STATE_SETTINGS
 } GameMode;
 
 // player data
@@ -66,6 +67,13 @@ typedef struct {
     int option_count;       
     int selected_index;     
 } PauseMenu;
+
+// settings menu
+typedef struct {
+    MenuOption options[4]; // volume, fps, back
+    int option_count;
+    int selected_index;
+} SettingsMenu;
 
 typedef struct {
     const char* text;
@@ -118,6 +126,7 @@ typedef struct GameState {
     GameMode mode;
     UiInfoScreen ui_info;
     PauseMenu pause_menu;
+    SettingsMenu settings_menu;
     float menu_cooldown;
     float paused_dx, paused_dy;
     Collectible collectibles[5];
@@ -137,6 +146,9 @@ typedef struct GameState {
     float animation_time;
     PowerUp power_ups[3]; 
     int power_up_count;
+    int music_volume; 
+    int sfx_volume;   
+    int target_fps;   
 } GameState;
 
 #endif 

@@ -26,6 +26,7 @@ void render_border(GameState* game);
 SDL_Texture* render_text(SDL_Renderer* renderer, const char* text, TTF_Font* font, SDL_Color fg);
 // renders a grid overlay, useful for debugging or showing grid-based layouts
 void render_grid_overlay(GameState* game);
+void render_pause_menu(GameState* game);
 
 SDL_Texture* render_text(SDL_Renderer* renderer, const char* text, TTF_Font* font, SDL_Color fg) {
     // create a surface from the text using the font and color
@@ -202,6 +203,38 @@ void render_pause_menu(GameState* game) {
     }
 }
 
+void render_settings_menu(GameState* game) {
+    SDL_SetRenderDrawBlendMode(game->renderer, SDL_BLENDMODE_BLEND);
+    SDL_SetRenderDrawColor(game->renderer, MENU_BACKDROP.r, MENU_BACKDROP.g, MENU_BACKDROP.b, MENU_BACKDROP.a);
+    SDL_Rect backdrop = {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
+    SDL_RenderFillRect(game->renderer, &backdrop);
+    SDL_RenderClear(game->renderer);
+
+    SDL_Color selected_color = SELECTED_COLOR;
+    SDL_Color unselected_color = BASE_COLOR;
+
+    int y_offset = WINDOW_HEIGHT / 2 - (game->settings_menu.option_count * 50) / 2;
+
+    for (int i = 0; i < game->settings_menu.option_count; i++) {
+        char option_text[64];
+        if (i == 0) {
+            snprintf(option_text, sizeof(option_text), "Music Volume: %d", game->music_volume);
+        } else if (i == 1) {
+            snprintf(option_text, sizeof(option_text), "SFX Volume: %d", game->sfx_volume);
+        } else if (i == 2) {
+            const char* fps_text = game->target_fps == 0 ? "Uncapped" : (game->target_fps == 60 ? "60 FPS" : "120 FPS");
+            snprintf(option_text, sizeof(option_text), "Frame Rate: %s", fps_text);
+        } else {
+            snprintf(option_text, sizeof(option_text), "%s", game->settings_menu.options[i].text); 
+        }
+
+        SDL_Color color = game->settings_menu.options[i].selected ? selected_color : unselected_color;
+        SDL_Texture* option_texture = render_text(game->renderer, option_text, game->font, color);
+        render_text_at(game->renderer, option_texture, WINDOW_WIDTH / 2, y_offset + i * 50, true);
+        SDL_DestroyTexture(option_texture);
+    }
+}
+
 void render_game(GameState* game) {
     
     // clear screen with black
@@ -254,6 +287,14 @@ void render_game(GameState* game) {
         render_collectibles(game);
         render_enemy(game);
         render_pause_menu(game);
+        render_grid_overlay(game);
+        render_border(game);
+    } else if (game->mode == STATE_SETTINGS) {
+        render_particles(&game->particles, game->renderer);
+        render_player_cube(&game->player, game->renderer);
+        render_collectibles(game);
+        render_enemy(game);
+        render_settings_menu(game);
         render_grid_overlay(game);
         render_border(game);
     }

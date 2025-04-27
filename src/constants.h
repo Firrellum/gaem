@@ -19,8 +19,8 @@
 #define GRID_CELL_SIZE 12
 #define GRID_COLOR (SDL_Color) {150, 150, 150, 50}
 
-#define FPS 120
-#define FRAME_TARGET_TIME (1000.0 / FPS)
+#define DEFAULT_FPS 120 
+#define FRAME_TARGET_TIME (1000.0 / DEFAULT_FPS)
 
 #define MOVE_SPEED 300.0f
 #define PLAYER_SIZE 12
@@ -32,5 +32,8 @@
 #define SPAWN_RATE 0.016f     
 
 #define MENU_DELAY 0.2f
+
+#define DEFAULT_MUSIC_VOLUME 16 
+#define DEFAULT_SFX_VOLUME 64   
 
 #endif
