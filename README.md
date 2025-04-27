@@ -4,8 +4,8 @@
 
 This is a side project built using SDL2 in C, designed as a learning exercise to create a reusable game template. The game, titled *F Cubed*, features a borderless 1280x720 window with multiple game states (start screen, playing, paused, settings), a player-controlled white cube with a particle trail, collectibles, enemies, and a dynamic pause menu. The project is modular, split across multiple source files for maintainability, and includes logging to `log.txt` for debugging.
 
-## Release - V0.9.0
-[Release - Latest](https://github.com/Firrellum/gaem/releases/tag/v0.9.0)
+## Release - V 1.0.0
+[Release - Latest](https://github.com/Firrellum/gaem/releases/tag/v1.0.0)
 
 ## Gameplay
 - Navigate a white cube to collect gold collectibles (+10 score each) and green health pickups (+25 HP).
